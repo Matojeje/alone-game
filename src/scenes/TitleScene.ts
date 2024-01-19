@@ -1,19 +1,11 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { Music } from "@/components/Music";
 
-import { title, version } from "@/version.json";
+import { title, team, version } from "@/version.json";
 
-const creditsLeft = `${title} 
+const creditsLeft = ``;
 
-@Handle
-@Handle
-@Handle`;
-
-const creditsRight = `
-
-role
-role
-role`;
+const creditsRight = `${team}\nFIT VUT IZHV 2024`;
 
 export class TitleScene extends BaseScene {
 	public sky: Phaser.GameObjects.Image;
@@ -64,7 +56,7 @@ export class TitleScene extends BaseScene {
 			y: 0.7 * this.H,
 			size: 160,
 			color: "#000",
-			text: "Game Title",
+			text: title,
 		});
 		this.title.setOrigin(0.5);
 		this.title.setStroke("#FFF", 8);
@@ -126,7 +118,7 @@ export class TitleScene extends BaseScene {
 		this.credits.add(credits1);
 
 		let credits2 = this.addText({
-			x: 0.85 * this.W,
+			x: this.W,
 			y: 0,
 			size: 40,
 			color: "#c2185b",
@@ -135,6 +127,8 @@ export class TitleScene extends BaseScene {
 		credits2.setStroke("#FFF", 10);
 		credits2.setPadding(2);
 		credits2.setLineSpacing(0);
+		credits2.setAlign("right");
+		credits2.setOrigin(1, 0);
 		this.credits.add(credits2);
 
 		// Music
@@ -142,9 +136,6 @@ export class TitleScene extends BaseScene {
 			this.musicTitle = new Music(this, "m_first", { volume: 0.4 });
 			this.musicTitle.on("bar", this.onBar, this);
 			this.musicTitle.on("beat", this.onBeat, this);
-
-			// this.select = this.sound.add("dayShift", { volume: 0.8, rate: 1.0 }) as Phaser.Sound.WebAudioSound;
-			// this.select2 = this.sound.add("nightShift", { volume: 0.8, rate: 1.0 }) as Phaser.Sound.WebAudioSound;
 		}
 		this.musicTitle.play();
 
@@ -210,9 +201,6 @@ export class TitleScene extends BaseScene {
 			this.subtitle.setAlpha(1);
 		} else if (!this.isStarting) {
 			this.sound.play("t_rustle", { volume: 0.3 });
-			// this.sound.play("m_slice", { volume: 0.3 });
-			// this.sound.play("u_attack_button", { volume: 0.5 });
-			// this.select2.play();
 			this.isStarting = true;
 			this.flash(3000, 0xffffff, 0.6);
 

@@ -14,7 +14,7 @@ const tryCatch = <T>(fun: () => T, fallback: T): T => {
 
 export const git_count = tryCatch(() => execSync('git rev-list --count HEAD').toString().trim(), "-1");
 export const git_short = tryCatch(() => execSync('git rev-parse --short HEAD').toString().trim(), "no-git");
-export const git_version = `v${git_count}.${git_short}`;
+export const git_version = `v${git_count} #${git_short}`;
 
 export const year_current = new Date().getFullYear();
 export const year_initial = tryCatch(() => Number(platform() == 'win32'

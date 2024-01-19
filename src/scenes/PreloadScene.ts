@@ -37,12 +37,12 @@ export class PreloadScene extends BaseScene {
 
 		// Loading text
 		this.addText({
-			x,
+			x: this.W / 2,
 			y,
 			size: 30,
 			color: "#DDDDDD",
 			text: "Loading...",
-		}).setOrigin(0, 1.5);
+		}).setOrigin(0.5, 1.5);
 		this.addText({
 			x: this.W,
 			y: this.H,
