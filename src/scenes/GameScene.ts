@@ -55,6 +55,7 @@ export class GameScene extends BaseScene {
 		})
 
 		this.initTouchControls();
+		this.setupZorder();
 	}
 
 	update(time: number, delta: number) {
@@ -154,5 +155,12 @@ export class GameScene extends BaseScene {
 			min: angle - (angleSpread/2),
 			max: angle + (angleSpread/2)
 		})
+	}
+
+	setupZorder() {
+		this.footprints	.setDepth(40)
+		this.player		.setDepth(50)
+		this.snowflakes	.setDepth(60)
+		this.ui			.setDepth(100)
 	}
 }
