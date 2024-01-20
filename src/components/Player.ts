@@ -4,6 +4,7 @@ const ACCELERATION = 150;
 const MAX_SPEED = 400;
 const FRICTION = 0.7;
 const TAPPING_TIMER = 200; // ms
+const DOWN = true, UP = false, RIGHT = true, LEFT = false;
 console.assert(
 	ACCELERATION / (1 - FRICTION) >= MAX_SPEED,
 	"Max speed unreachable"
@@ -23,6 +24,8 @@ export class Player extends Phaser.GameObjects.Container {
 	public isTapped: boolean;
 	private tappedTimer: number;
 	private inputVec: Phaser.Math.Vector2; // Just used for keyboard -> vector
+	private lastDirection: {ver: boolean, hor: boolean}; // Down/Right = true
+	private baseScale: number;
 	private touchPos: Phaser.Math.Vector2;
 	public velocity: Phaser.Math.Vector2;
 	private border: { [key: string]: number };
@@ -38,11 +41,15 @@ export class Player extends Phaser.GameObjects.Container {
 
 		/* Sprite */
 		this.spriteSize = 200;
-		this.sprite = this.scene.add.sprite(0, 0, "player");
+		this.lastDirection = {hor: RIGHT, ver: DOWN};
+		this.sprite = this.scene.add.sprite(0, 0, "player", 0);
 		this.sprite.setOrigin(0.5, 1.0);
 		this.sprite.y += this.spriteSize / 2;
-		this.sprite.setScale(this.spriteSize / this.sprite.width);
+		this.baseScale = this.spriteSize / this.sprite.width;
+		this.sprite.setScale(this.baseScale);
 		this.add(this.sprite);
+
+		this.setupAnimations();
 
 		/* Foot prints */
 		this.footprintSpacing = 100;
@@ -103,13 +110,24 @@ export class Player extends Phaser.GameObjects.Container {
 		this.x += (this.velocity.x * delta) / 1000;
 		this.y += (this.velocity.y * delta) / 1000;
 
+		// Spritesheet animation
+		const isMoving = this.inputVec.length() > 0.05;
+		const isMovingX = Math.abs(this.inputVec.x) > 0.05;
+		const isMovingY = Math.abs(this.inputVec.y) > 0.05;
+
+		if (isMovingX) this.lastDirection.hor = this.inputVec.x >= 0 ? RIGHT : LEFT;
+		if (isMovingY) this.lastDirection.ver = this.inputVec.y >= 0 ? DOWN : UP;
+
+		this.sprite.play(`${isMoving ? "walk" : "idle"}-${this.lastDirection.ver == DOWN ? "front" : "back"}`, true)
+
 		// Border collision
 		this.x = Phaser.Math.Clamp(this.x, this.border.left, this.border.right);
 		this.y = Phaser.Math.Clamp(this.y, this.border.top, this.border.bottom);
 
-		// Animation (Change to this.sprite.setScale if needed)
+		// Animation
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
-		this.setScale(1.0, squish);
+		this.setScale(this.lastDirection.hor == RIGHT ? 1 : -1, 1);
+		this.sprite.setScale(this.baseScale, this.baseScale * squish)
 
 		// Foot prints
 		const newPosition = new Phaser.Math.Vector2(this.x, this.y)
@@ -199,5 +217,23 @@ export class Player extends Phaser.GameObjects.Container {
 				yoyo: true,
 			});
 		}
+	}
+
+	setupAnimations() {
+		
+		const that = this
+		function addAnim(key: string, frames: number[], duration=150) {
+			return that.scene.anims.create({
+				key, repeat: -1, frames: frames.map(n => {
+					return {key: that.sprite.texture.key, frame: n, duration}
+				})
+			})
+		}
+
+		addAnim("idle-front", [0])
+		addAnim("walk-front", [3,1,2,1])
+		addAnim("idle-back",  [4])
+		addAnim("walk-back",  [7,5,6,5])
+
 	}
 }

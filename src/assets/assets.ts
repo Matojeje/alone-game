@@ -7,7 +7,7 @@ const images: Image[] = [
 	image('backgrounds/background', 'background'),
 
 	// Characters
-	image('characters/player', 'player'),
+	// image('characters/player', 'player'),
 
 	// Particles
 	image('particles/footprint', 'footprint'),
@@ -28,6 +28,7 @@ const images: Image[] = [
 
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
+	spritesheet('characters/player', 'player', 380, 540),
 
 ];
 
