@@ -80,6 +80,8 @@ export class Player extends Phaser.GameObjects.Container {
 	}
 
 	update(time: number, delta: number) {
+		const prevPosition = new Phaser.Math.Vector2(this.x, this.y)
+
 		// Movement
 		this.handleInput();
 
@@ -110,7 +112,8 @@ export class Player extends Phaser.GameObjects.Container {
 		this.setScale(1.0, squish);
 
 		// Foot prints
-		const deltaDistance = this.velocity.length() * delta * 1e-3
+		const newPosition = new Phaser.Math.Vector2(this.x, this.y)
+		const deltaDistance = prevPosition.distance(newPosition)
 		this.distanceWalked += deltaDistance
 		this.distSinceLastFootprint += deltaDistance
 
