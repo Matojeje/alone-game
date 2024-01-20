@@ -2,8 +2,8 @@ import { GameScene } from "@/scenes/GameScene";
 export class Footprint extends Phaser.GameObjects.Container {
 
     public scene: GameScene;
-    public alive: boolean;
     public aliveTime: number;
+    public index: number;
 
 	private sprite: Phaser.GameObjects.Sprite;
 	private spriteSize: number;
@@ -26,7 +26,6 @@ export class Footprint extends Phaser.GameObjects.Container {
 
     update(time: number, delta: number) {
         this.aliveTime += delta;
-
-        if (this.aliveTime > 10_000) {this.destroy()}
+        // if (this.aliveTime > 10_000) {this.destroy()}
     }
 }

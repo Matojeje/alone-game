@@ -7,7 +7,8 @@ export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private player: Player;
 	private ui: UI;
-	private footprints: Footprint[];
+	private footprints: Phaser.GameObjects.Group;
+	private totalSteps: number;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -27,14 +28,19 @@ export class GameScene extends BaseScene {
 
 		this.ui = new UI(this);
 
-		this.footprints = [];
+		this.footprints = this.add.group({
+			classType: Footprint,
+			runChildUpdate: true,
+			maxSize: 20,
+		});
+
+		this.totalSteps = 0;
 
 		this.initTouchControls();
 	}
 
 	update(time: number, delta: number) {
 		this.player.update(time, delta);
-		this.footprints.forEach(f => f.update(time, delta));
 	}
 
 
@@ -73,8 +79,38 @@ export class GameScene extends BaseScene {
 	}
 
 	addFootprint() {
-		const step = new Footprint(this, this.player.x, this.player.y)
-		this.footprints.push(step)
-		console.log(this.footprints)
+
+		// Free up old footprints
+		if (this.footprints.isFull()) {
+			const prints = this.footprints.getChildren()
+			.filter(x => x.active),
+
+			indices = prints.map(x => {
+				const footprint = x as Footprint
+				return footprint.index
+			}),
+
+			oldestIdx = Math.min(...indices),
+			oldestStep = prints.find(x => {
+				const footprint = x as Footprint
+				return footprint.index === oldestIdx
+			});
+
+			if (oldestStep) this.footprints.killAndHide(oldestStep)
+			else console.warn("Step #", oldestIdx, "not found")
+		}
+
+		// Add new footprint
+		const step: Footprint = this.footprints.getLast(false, true, this.player.x, this.player.y);
+		if (!step) return;
+		step.aliveTime = 0;
+		step.index = this.totalSteps++;
+		step.setVisible(true);
+		step.setActive(true);
+
+		/* console.debug(this.footprints.getChildren().map(x => {
+			const fp = x as Footprint
+			return `#${fp.index} ${x.active ? "alive" : "dead"}`
+		})) */
 	}
 }
