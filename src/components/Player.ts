@@ -33,6 +33,8 @@ export class Player extends Phaser.GameObjects.Container {
 	public footprintSpacing: number;
 	private distanceWalked: number;
 	private distSinceLastFootprint: number;
+	private lastFootprintPlayerLoc: Phaser.Math.Vector2;
+	private lastFootStepped: boolean;
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
@@ -55,6 +57,8 @@ export class Player extends Phaser.GameObjects.Container {
 		this.footprintSpacing = 100;
 		this.distanceWalked = 0;
 		this.distSinceLastFootprint = 0;
+		this.lastFootStepped = RIGHT;
+		this.lastFootprintPlayerLoc = new Phaser.Math.Vector2(this.x, this.y);
 
 		/* Controls */
 		if (this.scene.input.keyboard) {
@@ -132,8 +136,10 @@ export class Player extends Phaser.GameObjects.Container {
 		// Foot prints
 		const newPosition = new Phaser.Math.Vector2(this.x, this.y)
 		const deltaDistance = prevPosition.distance(newPosition)
+		const deltaDistanceFootprint = this.lastFootprintPlayerLoc.distance(newPosition)
+
 		this.distanceWalked += deltaDistance
-		this.distSinceLastFootprint += deltaDistance
+		this.distSinceLastFootprint = deltaDistanceFootprint
 
 		if (this.distSinceLastFootprint >= this.footprintSpacing) {
 			this.distSinceLastFootprint %= this.footprintSpacing
@@ -238,14 +244,25 @@ export class Player extends Phaser.GameObjects.Container {
 	}
 
 	getPaw() {
+		const foot = this.lastFootStepped
+		this.lastFootStepped = !this.lastFootStepped
+		this.lastFootprintPlayerLoc = new Phaser.Math.Vector2(this.x, this.y)
+
 		const LOW = 0.23, MID = 0.2, HI = 0.17;
-		const framePawHeight = [MID, MID, LOW, HI, MID, MID, LOW, HI]
-		const thisFrame = this.sprite.anims.currentFrame?.index ?? 0
+		const TOP = 10, BTM = -10;
+
+		// const framePawHeight = [MID, MID, LOW, HI, MID, MID, LOW, HI]
+		// const framePawTilt = [0, 0, BTM, TOP, 0, 0, BTM, TOP]
+		// const thisFrame = this.sprite.anims.currentFrame?.index ?? 0
 
 		return {
 			x: this.x,
-			y: this.y + this.sprite.displayHeight * framePawHeight[thisFrame],
-			facing: this.lastDirection.hor
+			y: this.y + this.sprite.displayHeight * (foot ? LOW : HI),
+			facing: this.lastDirection,
+			tilt: Phaser.Math.DegToRad(
+				(foot ? TOP : BTM) * (this.lastDirection.ver ? 1 : -1)
+				+ (this.lastDirection.ver ? 20 : -20)
+			)
 		}
 	}
 }

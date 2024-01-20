@@ -33,7 +33,7 @@ export class GameScene extends BaseScene {
 		this.footprints = this.add.group({
 			classType: Footprint,
 			runChildUpdate: true,
-			maxSize: 20,
+			maxSize: 300,
 		});
 
 		this.totalSteps = 0;
@@ -126,7 +126,8 @@ export class GameScene extends BaseScene {
 		step.index = this.totalSteps++;
 		step.setVisible(true);
 		step.setActive(true);
-		step.scaleX = paw.facing ? 1 : -1;
+		step.scaleX = paw.facing.hor ? 1 : -1;
+		step.rotation = paw.tilt;
 
 		/* console.debug(this.footprints.getChildren().map(x => {
 			const fp = x as Footprint
