@@ -43,3 +43,14 @@ export const loadFont = async (path: string, name: string) => {
 	document.fonts.add(face);
 }
 
+export type ObjectWithRandomPoint = {
+	getRandomPoint: (point?: any) => Phaser.Geom.Point;
+}
+
+export const randomZoneFromShape = (shape: ObjectWithRandomPoint) => new Phaser.GameObjects.Particles.Zones.RandomZone({
+	getRandomPoint(point) {
+		const newPoint = shape.getRandomPoint();
+		point.x = newPoint.x;
+		point.y = newPoint.y;
+	},
+})

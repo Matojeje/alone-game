@@ -157,6 +157,10 @@ export class TitleScene extends BaseScene {
 	}
 
 	update(time: number, delta: number) {
+
+		// Debug only!
+		this.scene.start("GameScene");
+
 		if (this.background.visible) {
 			this.background.y += 0.02 * (this.CY - this.background.y);
 			this.foreground.y += 0.025 * (this.CY - this.foreground.y);

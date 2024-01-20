@@ -2,6 +2,7 @@ import { BaseScene } from "@/scenes/BaseScene";
 import { Player } from "@/components/Player";
 import { Footprint } from "@/components/Footprint";
 import { UI } from "@/components/UI";
+import { randomZoneFromShape } from '../assets/util';
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -9,6 +10,7 @@ export class GameScene extends BaseScene {
 	private ui: UI;
 	private footprints: Phaser.GameObjects.Group;
 	private totalSteps: number;
+	private snowflakes: Phaser.GameObjects.Particles.ParticleEmitter;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -35,6 +37,22 @@ export class GameScene extends BaseScene {
 		});
 
 		this.totalSteps = 0;
+
+		const topLine = new Phaser.Curves.Line([0, 0, this.W, 0])
+		const bottomLine = new Phaser.Curves.Line([0, this.H, this.W, this.H])
+
+		
+		this.snowflakes = this.add.particles(0, 0, "snowflake", {
+			lifespan: {min: 3500, max: 8000},
+			alpha: {start: 0.8, end: 0},
+			scale: {min: 0.3, max: 0.5},
+			speedX: {min: -100, max: 20},
+			speedY: {min: 150, max: 250},
+			frequency: 150,
+			gravityY: 50,
+			emitting: true,
+			emitZone: randomZoneFromShape(topLine),
+		})
 
 		this.initTouchControls();
 	}
@@ -112,5 +130,26 @@ export class GameScene extends BaseScene {
 			const fp = x as Footprint
 			return `#${fp.index} ${x.active ? "alive" : "dead"}`
 		})) */
+	}
+
+	setSnowflakeSpeed(angle=0, speed=0, angleSpread=0, speedSpread=0) {
+		const baseVector = new Phaser.Math.Vector2
+		baseVector.setToPolar(Phaser.Math.DegToRad(angle), speed)
+
+		const minVector = baseVector.clone()
+		const maxVector = baseVector.clone()
+		minVector.rotate(Phaser.Math.DegToRad(angleSpread / 2))
+		maxVector.rotate(Phaser.Math.DegToRad(angleSpread / -2))
+		minVector.setLength(speed + speedSpread / 2)
+		maxVector.setLength(speed - speedSpread / 2)
+
+		this.snowflakes.speedX = {min: minVector.x, max: maxVector.x}
+		this.snowflakes.speedY = {min: minVector.y, max: maxVector.y}
+
+		this.snowflakes.speed = speed
+		this.snowflakes.setEmitterAngle({
+			min: angle - (angleSpread/2),
+			max: angle + (angleSpread/2)
+		})
 	}
 }
