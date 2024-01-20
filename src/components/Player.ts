@@ -27,6 +27,10 @@ export class Player extends Phaser.GameObjects.Container {
 	public velocity: Phaser.Math.Vector2;
 	private border: { [key: string]: number };
 
+	public footprintSpacing: number;
+	private distanceWalked: number;
+	private distSinceLastFootprint: number;
+
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -39,6 +43,11 @@ export class Player extends Phaser.GameObjects.Container {
 		this.sprite.y += this.spriteSize / 2;
 		this.sprite.setScale(this.spriteSize / this.sprite.width);
 		this.add(this.sprite);
+
+		/* Foot prints */
+		this.footprintSpacing = 100;
+		this.distanceWalked = 0;
+		this.distSinceLastFootprint = 0;
 
 		/* Controls */
 		if (this.scene.input.keyboard) {
@@ -93,22 +102,22 @@ export class Player extends Phaser.GameObjects.Container {
 		this.y += (this.velocity.y * delta) / 1000;
 
 		// Border collision
-		if (this.x < this.border.left) {
-			this.x = this.border.left;
-		}
-		if (this.x > this.border.right) {
-			this.x = this.border.right;
-		}
-		if (this.y < this.border.top) {
-			this.y = this.border.top;
-		}
-		if (this.y > this.border.bottom) {
-			this.y = this.border.bottom;
-		}
+		this.x = Phaser.Math.Clamp(this.x, this.border.left, this.border.right);
+		this.y = Phaser.Math.Clamp(this.y, this.border.top, this.border.bottom);
 
 		// Animation (Change to this.sprite.setScale if needed)
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
 		this.setScale(1.0, squish);
+
+		// Foot prints
+		const deltaDistance = this.velocity.length() * delta * 1e-3
+		this.distanceWalked += deltaDistance
+		this.distSinceLastFootprint += deltaDistance
+
+		if (this.distSinceLastFootprint >= this.footprintSpacing) {
+			this.distSinceLastFootprint %= this.footprintSpacing
+			this.scene.addFootprint()
+		}
 	}
 
 	handleInput() {

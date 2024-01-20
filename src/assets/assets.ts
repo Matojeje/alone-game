@@ -8,6 +8,7 @@ const images: Image[] = [
 
 	// Characters
 	image('characters/player', 'player'),
+	image('characters/footprint', 'footprint'),
 
 	// Items
 	image('items/coin', 'coin'),

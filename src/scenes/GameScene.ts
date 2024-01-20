@@ -1,11 +1,13 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { Player } from "@/components/Player";
+import { Footprint } from "@/components/Footprint";
 import { UI } from "@/components/UI";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private player: Player;
 	private ui: UI;
+	private footprints: Footprint[];
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -25,11 +27,14 @@ export class GameScene extends BaseScene {
 
 		this.ui = new UI(this);
 
+		this.footprints = [];
+
 		this.initTouchControls();
 	}
 
 	update(time: number, delta: number) {
 		this.player.update(time, delta);
+		this.footprints.forEach(f => f.update(time, delta));
 	}
 
 
@@ -65,5 +70,11 @@ export class GameScene extends BaseScene {
 				this.player.touchEnd(pointer.x, pointer.y);
 			}
 		});
+	}
+
+	addFootprint() {
+		const step = new Footprint(this, this.player.x, this.player.y)
+		this.footprints.push(step)
+		console.log(this.footprints)
 	}
 }
