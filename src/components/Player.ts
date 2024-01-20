@@ -236,4 +236,16 @@ export class Player extends Phaser.GameObjects.Container {
 		addAnim("walk-back",  [7,5,6,5])
 
 	}
+
+	getPaw() {
+		const LOW = 0.23, MID = 0.2, HI = 0.17;
+		const framePawHeight = [MID, MID, LOW, HI, MID, MID, LOW, HI]
+		const thisFrame = this.sprite.anims.currentFrame?.index ?? 0
+
+		return {
+			x: this.x,
+			y: this.y + this.sprite.displayHeight * framePawHeight[thisFrame],
+			facing: this.lastDirection.hor
+		}
+	}
 }

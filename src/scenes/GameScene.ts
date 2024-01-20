@@ -119,12 +119,14 @@ export class GameScene extends BaseScene {
 		}
 
 		// Add new footprint
-		const step: Footprint = this.footprints.getLast(false, true, this.player.x, this.player.y);
+		const paw = this.player.getPaw()
+		const step: Footprint = this.footprints.getLast(false, true, paw.x, paw.y);
 		if (!step) return;
 		step.aliveTime = 0;
 		step.index = this.totalSteps++;
 		step.setVisible(true);
 		step.setActive(true);
+		step.scaleX = paw.facing ? 1 : -1;
 
 		/* console.debug(this.footprints.getChildren().map(x => {
 			const fp = x as Footprint
