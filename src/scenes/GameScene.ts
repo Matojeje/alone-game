@@ -20,6 +20,7 @@ export class GameScene extends BaseScene {
 	private footprints: Phaser.GameObjects.Group;
 	private totalSteps: number;
 	private snowflakes: Phaser.GameObjects.Particles.ParticleEmitter;
+	private snowman: Phaser.GameObjects.Image;
 
 	private tilemap: Phaser.Tilemaps.Tilemap;
 	private layers: Map<string, Phaser.Tilemaps.TilemapLayer>;
@@ -109,6 +110,9 @@ export class GameScene extends BaseScene {
 		if (!this.music) this.music = new Music(this, "bgm", { volume: 0.4 });
 		this.music.play();
 
+		this.snowman = this.add.image(9119, 6200, "snowman");
+		this.snowman.setScale(1.5);
+
 		this.resetMagic();
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
@@ -128,6 +132,11 @@ export class GameScene extends BaseScene {
 		if (this.roomChange) this.changeRoom(this.currentRoom)
 		this.ui.update(time, delta);
 
+		if (this.snowman) {
+			// @ts-ignore
+			this.snowman.setDepth(this.player.depth + (this.snowman.getBottomRight().y > this.player.getColliderBounds().bottom+30 ? 1 : -1))
+		}
+
 		this.magic.prints.forEach(m => m.update(time, delta))
 		this.sparkles.forEach(s => s.update(time, delta, this.player.getColliderBounds()))
 
@@ -145,9 +154,9 @@ export class GameScene extends BaseScene {
 			)
 
 			if (cycle < 100)
-				m.object.sprite.play("lower", true)
+				try {m.object.sprite.play("lower", true)} catch(error) {console.error(error)}
 			else if (cycle > periodActive && cycle < periodActive+100) {
-				m.object.sprite.play("raise", true)
+				try {m.object.sprite.play("raise", true)} catch(error) {console.error(error)}
 				if (playerTouched) this.player.hurt()
 			}
 		})
@@ -435,7 +444,7 @@ export class GameScene extends BaseScene {
 							Phaser.Math.RND.realInRange(0.4, 0.6),
 						)
 
-						m.sprite.play("spike")
+						try {m.sprite.play("spike")} catch(error) {console.error(error)}
 						const body = this.physics.add.existing(m, true).body as Phaser.Physics.Arcade.Body
 						body.setCircle(this.tilemap.tileWidth*0.6, -this.tilemap.tileWidth*0.6, -this.tilemap.tileHeight*0.8)
 						const collider = this.physics.add.collider(this.player, m);

@@ -3,6 +3,8 @@ import { image, sound, music, level, loadFont, spritesheet } from './util';
 
 /* Images */
 const images: Image[] = [
+	image('characters/snowman', 'snowman'),
+
 	// Backgrounds
 	image('backgrounds/background', 'background'),
 	image('backgrounds/foreground', 'foreground'),
