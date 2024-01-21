@@ -1,13 +1,13 @@
-import { Image, SpriteSheet, Audio } from './util';
-import { image, sound, music, loadFont, spritesheet } from './util';
+import { Image, SpriteSheet, Audio, Level } from './util';
+import { image, sound, music, level, loadFont, spritesheet } from './util';
 
 /* Images */
 const images: Image[] = [
 	// Backgrounds
 	image('backgrounds/background', 'background'),
 
-	// Characters
-	// image('characters/player', 'player'),
+	// Tilesets
+	image('tilesets/debugtiles', 'debugtiles'),
 
 	// Particles
 	image('particles/footprint', 'footprint'),
@@ -39,11 +39,17 @@ const audios: Audio[] = [
 	sound('tree/rustle', 't_rustle', 0.5),
 ];
 
+/* Levels */
+const levels: Level[] = [
+	level('level', 'level'),
+]
+
 /* Fonts */
 await loadFont('Sketch', 'Game Font');
 
 export {
 	images,
 	spritesheets,
+	levels,
 	audios
 };

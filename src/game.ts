@@ -18,6 +18,13 @@ const config: Phaser.Types.Core.GameConfig = {
 	title,
 	version,
 
+	physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true
+        }
+    },
+
 	plugins: {
 		global: [
 			{

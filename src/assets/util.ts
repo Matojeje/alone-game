@@ -17,6 +17,11 @@ export interface Audio {
 	rate?: number;
 }
 
+export interface Level {
+	key: string;
+	path: string;
+}
+
 const imageGlob = import.meta.glob('./images/**/*.png', {as: 'url', eager: true});
 export const image = (path: string, key: string): Image => {
 	return { key, path: imageGlob[`./images/${path}.png`] };
@@ -34,6 +39,11 @@ export const music = (path: string, key: string, volume?: number, rate?: number)
 const audioGlob = import.meta.glob('./sounds/**/*.mp3', {as: 'url', eager: true});
 export const sound = (path: string, key: string, volume?: number, rate?: number): Audio => {
 	return { key, volume, rate, path: audioGlob[`./sounds/${path}.mp3`] };
+}
+
+const levelGlob = import.meta.glob('./levels/**/*.json', {as: 'url', eager: true});
+export const level = (path: string, key: string): Level => {
+	return { key, path: levelGlob[`./levels/${path}.json`] };
 }
 
 const fontGlob = import.meta.glob('./fonts/**/*.ttf', {as: 'url', eager: true});

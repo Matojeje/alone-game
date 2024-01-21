@@ -12,6 +12,11 @@ export class GameScene extends BaseScene {
 	private totalSteps: number;
 	private snowflakes: Phaser.GameObjects.Particles.ParticleEmitter;
 
+	private tilemap: Phaser.Tilemaps.Tilemap;
+	private layers: Map<string, Phaser.Tilemaps.TilemapLayer>;
+	private rooms: Map<string, Phaser.Types.Tilemaps.TiledObject>;
+	private currentRoom: string;
+
 	constructor() {
 		super({ key: "GameScene" });
 	}
@@ -19,9 +24,11 @@ export class GameScene extends BaseScene {
 	create(): void {
 		this.fade(false, 200, 0x000000);
 
-		this.background = this.add.image(0, 0, "background");
-		this.background.setOrigin(0);
-		this.fitToScreen(this.background);
+		// this.background = this.add.image(0, 0, "background");
+		// this.background.setOrigin(0);
+		// this.fitToScreen(this.background);
+
+		this.tilemap = this.make.tilemap({key: "level"});
 
 		this.player = new Player(this, this.CX, this.CY);
 		this.player.on("action", () => {
@@ -33,7 +40,7 @@ export class GameScene extends BaseScene {
 		this.footprints = this.add.group({
 			classType: Footprint,
 			runChildUpdate: true,
-			maxSize: 300,
+			maxSize: 40,
 		});
 
 		this.totalSteps = 0;
@@ -41,7 +48,6 @@ export class GameScene extends BaseScene {
 		const topLine = new Phaser.Curves.Line([0, 0, this.W, 0])
 		const bottomLine = new Phaser.Curves.Line([0, this.H, this.W, this.H])
 
-		
 		this.snowflakes = this.add.particles(0, 0, "snowflake", {
 			lifespan: {min: 3500, max: 8000},
 			alpha: {start: 0.8, end: 0},
@@ -54,6 +60,8 @@ export class GameScene extends BaseScene {
 			emitZone: randomZoneFromShape(topLine),
 		})
 
+		this.loadTilemap();
+		this.changeRoom("Welcome");
 		this.initTouchControls();
 		this.setupZorder();
 	}
@@ -62,6 +70,60 @@ export class GameScene extends BaseScene {
 		this.player.update(time, delta);
 	}
 
+
+	loadTilemap() {
+		// Load tileset
+		const tileset = this.tilemap.addTilesetImage("debugtiles", "debugtiles", 64, 64);
+		if (tileset == null) throw new Error("Tileset creation error");
+
+		// Load layers
+		const layers = [
+			{name: "Wall",   collides: true},
+			{name: "Ground", collides: false},
+		]
+		
+		this.layers = new Map();
+		layers.forEach(({name, collides}) => {
+			const layer = this.tilemap.createLayer(name, tileset);
+			if (layer == null) throw new Error("Layer creation error");
+
+			this.layers.set(name, layer)
+			if (collides) {
+				this.physics.add.collider(this.player, layer);
+				layer.setCollisionByProperty({collides});
+			}
+		})
+		
+		// Physics
+		this.physics.world.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
+		
+		// Read map objects
+		this.rooms = new Map();
+
+		this.tilemap.objects.find(objLayer => objLayer.name == "Objects")
+		?.objects.forEach(obj => {
+			switch (obj.type) {
+				case "Room":
+					this.rooms.set(obj.name, obj)
+					break;
+			
+				case "Spawn":
+					if (obj.x) this.player.x = obj.x
+					if (obj.y) this.player.y = obj.y
+
+				default:
+					console.warn("Unknown object type", obj.type)
+					break;
+			}
+		})
+
+		// Add collisions.
+		// this.physics.add.collider(this.player,  this.layer);
+		/* this.physics.add.overlap(this.player,   this.stairs,     function() {
+			this.player.onStairs = true;
+		}, null, this); */
+
+	}
 
 	initTouchControls() {
 		this.input.addPointer(2);
@@ -162,5 +224,22 @@ export class GameScene extends BaseScene {
 		this.player		.setDepth(50)
 		this.snowflakes	.setDepth(60)
 		this.ui			.setDepth(100)
+	}
+
+	changeRoom(roomName = "Welcome") {
+		const room = this.rooms.get(roomName)
+		if (!room) {
+			console.warn("Room not found")
+			return
+		}
+
+		this.currentRoom = room.name;
+
+		this.cameras.main.setBounds(
+			room.x ?? 0,
+			room.y ?? 0,
+			room.width ?? this.W,
+			room.height ?? this.H,
+		)
 	}
 }
