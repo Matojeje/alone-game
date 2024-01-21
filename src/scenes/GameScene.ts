@@ -10,6 +10,10 @@ export class GameScene extends BaseScene {
 	private debug: boolean;
 
 	private background: Phaser.GameObjects.Image;
+	private foreground: Phaser.GameObjects.Image;
+	private iceBackground: Phaser.GameObjects.Image;
+	private iceReflection: Phaser.GameObjects.Image;
+
 	private player: Player;
 	private ui: UI;
 	private music: Phaser.Sound.WebAudioSound;
@@ -47,10 +51,24 @@ export class GameScene extends BaseScene {
 		this.debug = debug;
 		this.fade(false, 200, 0x000000);
 
-		// this.background = this.add.image(0, 0, "background");
-		// this.background.setOrigin(0);
-		// this.fitToScreen(this.background);
+		/* Backgrounds */
+		this.iceBackground = this.add.image(0, 0, "ice");
+		this.iceBackground.setScrollFactor(0, 0);
+		this.fitToScreen(this.iceBackground);
+		
+		this.iceReflection = this.add.image(0, 0, "reflection");
+		this.iceReflection.setScrollFactor(0, 0.15);
+		this.fitToScreen(this.iceReflection);
 
+		this.background = this.add.image(-2048, -2048, "background");
+		this.background.setOrigin(0);
+		this.background.setScale(2);
+
+		this.foreground = this.add.image(-2048, -2048, "foreground");
+		this.foreground.setOrigin(0);
+		this.foreground.setScale(2);
+
+		/* Components */
 		this.tilemap = this.make.tilemap({key: "level"});
 
 		this.player = new Player(this, this.CX, this.CY);
@@ -78,7 +96,7 @@ export class GameScene extends BaseScene {
 			scale: {min: 0.2, max: 0.4},
 			speedX: {min: -100, max: 20},
 			speedY: {min: 150, max: 250},
-			frequency: 5,
+			frequency: 2,
 			gravityY: 50,
 			emitting: true,
 			emitZone: randomZoneFromShape(snowflakeArea),
@@ -96,6 +114,11 @@ export class GameScene extends BaseScene {
 		this.initTouchControls();
 		this.setupZorder();
 		this.setupAnimations();
+		this.tilemapAlpha(0);
+
+		// @ts-ignore // I should've added this ages ago
+		window.scene = this
+		console.info("You can debug this scene using `window.scene`!")
 	}
 
 	update(time: number, delta: number) {
@@ -288,6 +311,7 @@ export class GameScene extends BaseScene {
 		if (!step) return;
 		step.aliveTime = 0;
 		step.index = this.totalSteps++;
+		step.setDepth(this.background.depth + 1)
 		step.setVisible(true);
 		step.setActive(true);
 		step.scaleX = paw.facing.hor ? 1 : -1;
@@ -321,10 +345,27 @@ export class GameScene extends BaseScene {
 	}
 
 	setupZorder() {
+		this.iceBackground	.setDepth(10)
+		this.iceReflection	.setDepth(20)
+		this.background	.setDepth(30)
 		this.footprints	.setDepth(40)
 		this.player		.setDepth(50)
+		this.foreground	.setDepth(55)
 		this.snowflakes	.setDepth(60)
 		this.ui			.setDepth(100)
+	}
+
+	tilemapAlpha(alpha: number) {
+		// console.debug(this.tilemap)
+		this.tilemap.layers.forEach(l => {
+			// console.debug("Set", l.name, alpha)
+			l.tilemapLayer.setAlpha(alpha)
+		})
+	}
+
+	backgroundAlpha(alpha: number) {
+		;[this.background, this.foreground, this.iceReflection, this.iceReflection]
+		.forEach(image => image.setAlpha(alpha))
 	}
 
 	changeRoom(roomName = "Welcome", smoothCamera = true) {
@@ -439,6 +480,8 @@ export class GameScene extends BaseScene {
 		if (!smoothCamera) {
 			this.cameras.main.setZoom(properties.zoom)
 			this.cameras.main.setBounds(room.x, room.y, room.width, room.height)
+			this.fitToScreen(this.iceBackground);
+			this.fitToScreen(this.iceReflection);
 			return
 		}
 
@@ -456,7 +499,11 @@ export class GameScene extends BaseScene {
 			y: {from: prev.y, to: room.y},
 			width: {from: prev.width, to: room.width},
 			height: {from: prev.height, to: room.height},
-			onUpdate: (tween, t) => this.cameras.main.setBounds(t.x, t.y, t.width, t.height)
+			onUpdate: (tween, t) => {
+				this.cameras.main.setBounds(t.x, t.y, t.width, t.height)
+				this.fitToScreen(this.iceBackground);
+				this.fitToScreen(this.iceReflection);
+			}
 		})
 
 		this.tweens.add({

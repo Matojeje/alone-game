@@ -25,6 +25,8 @@ const config: Phaser.Types.Core.GameConfig = {
         }
     },
 
+	backgroundColor: 0x2b65eb,
+
 	plugins: {
 		global: [
 			{

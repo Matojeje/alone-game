@@ -90,7 +90,10 @@ export class BaseScene extends Phaser.Scene {
 
 	// The image keeps its aspect ratio, but is resized to fit within the given dimension
 	fitToScreen(image: Phaser.GameObjects.Image): void {
-		image.setScale(Math.max(this.W / image.width, this.H / image.height));
+		image.setScale(Math.max(this.cameras.main.width / image.width, this.cameras.main.height / image.height) / this.cameras.main.zoom);
+		image.setOrigin(0.5, 0.5);
+		image.x = this.CX;
+		image.y = this.CY;
 	}
 
 	// The image keeps its aspect ratio and fills the given dimension. The image will be clipped to fit

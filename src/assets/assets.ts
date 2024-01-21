@@ -5,6 +5,9 @@ import { image, sound, music, level, loadFont, spritesheet } from './util';
 const images: Image[] = [
 	// Backgrounds
 	image('backgrounds/background', 'background'),
+	image('backgrounds/foreground', 'foreground'),
+	image('backgrounds/reflection', 'reflection'),
+	image('backgrounds/ice', 'ice'),
 
 	// Tilesets
 	image('tilesets/debugtiles', 'debugtiles'),
