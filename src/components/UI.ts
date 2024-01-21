@@ -1,6 +1,7 @@
 import { GameScene } from "@/scenes/GameScene";
 
 let yShown: number, yHidden: number;
+const UP = true, DOWN = false;
 
 export class UI extends Phaser.GameObjects.Container {
 	public scene: GameScene;
@@ -12,6 +13,7 @@ export class UI extends Phaser.GameObjects.Container {
 	private panelTimer: number;
 	private panelShown: boolean;
 	private panelTween: Phaser.Tweens.Tween;
+	private panelTweenDirection: boolean;
 
 	constructor(scene: GameScene) {
 		super(scene, 0, 0);
@@ -50,6 +52,18 @@ export class UI extends Phaser.GameObjects.Container {
 	update(time: number, delta: number) {
 		//console.debug(this.panelShown, this.panelTimer)
 		
+		const relativeScale = this.scene.cameras.main.displayHeight / this.scene.cameras.main.height
+		const nudge = (relativeScale - 1) / 2.15 + 1
+		this.panel.scale = relativeScale
+
+		// console.debug(relativeScale, nudge)
+		
+		if (this.panelTween?.isPlaying()) {
+			this.panelTween.updateTo("y", this.panelTweenDirection == UP ? yShown*nudge : yHidden*nudge, false)
+		} else {
+			this.panel.y = this.panelShown ? yShown*nudge : yHidden*nudge
+		}
+		
 		this.panelTimer = Math.max(0, this.panelTimer - delta)
 		if (this.panelShown && this.panelTimer <= 0) {
 			this.hidePanel()
@@ -60,6 +74,7 @@ export class UI extends Phaser.GameObjects.Container {
 		
 		this.text.setText(text)
 		this.panelTimer = duration
+		this.panelTweenDirection = UP
 
 		if (this.panelShown) {
 			this.scene.tweens.add({
@@ -71,24 +86,26 @@ export class UI extends Phaser.GameObjects.Container {
 			return
 		} else this.panelShown = true
 
-		if (this.panelTween) this.scene.tweens.remove(this.panelTween)
+		if (this.panelTween?.isPlaying()) this.scene.tweens.remove(this.panelTween)
 		this.panelTween = this.scene.tweens.add({
 			targets: this.panel,
 			duration: 400,
 			ease: "Cubic",
-			y: {from: yHidden, to: yShown},
+			y: {from: this.panel.y, to: yShown},
 		})
 
 	}
 
 	hidePanel() {
 		this.panelShown = false
-		if (this.panelTween) this.scene.tweens.remove(this.panelTween)
+		this.panelTweenDirection = DOWN
+
+		if (this.panelTween?.isPlaying()) this.scene.tweens.remove(this.panelTween)
 		this.panelTween = this.scene.tweens.add({
 			targets: this.panel,
 			duration: 400,
 			ease: "Cubic",
-			y: {from: yShown, to: yHidden},
+			y: {from: this.panel.y, to: yHidden},
 		})
 	}
 }

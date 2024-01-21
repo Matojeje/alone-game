@@ -1091,11 +1091,11 @@
     <property name="staticCamera" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="2" name="Spawn point" type="Spawn" x="-268" y="548">
+  <object id="2" name="Spawn point" type="Spawn" x="-256" y="448">
    <point/>
   </object>
   <object id="3" name="Snowed over" type="Room" x="1088" y="-512" width="2304" height="2112"/>
-  <object id="7" name="Magical footprints" type="Room" x="6592" y="1664" width="1920" height="1088">
+  <object id="7" name="Icy steps" type="Room" x="6592" y="1664" width="1920" height="1088">
    <properties>
     <property name="staticCamera" type="bool" value="true"/>
    </properties>

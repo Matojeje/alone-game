@@ -1351,8 +1351,8 @@
                  "type":"Spawn",
                  "visible":true,
                  "width":0,
-                 "x":-268,
-                 "y":548
+                 "x":-256,
+                 "y":448
                 }, 
                 {
                  "height":2112,
@@ -1368,7 +1368,7 @@
                 {
                  "height":1088,
                  "id":7,
-                 "name":"Magical footprints",
+                 "name":"Icy steps",
                  "properties":[
                         {
                          "name":"staticCamera",

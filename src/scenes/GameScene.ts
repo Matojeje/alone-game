@@ -72,8 +72,6 @@ export class GameScene extends BaseScene {
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
 		this.setupZorder();
-
-		// this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
 	}
 
 	update(time: number, delta: number) {
@@ -82,6 +80,8 @@ export class GameScene extends BaseScene {
 
 		if (this.roomChange) this.changeRoom(this.currentRoom)
 		this.ui.update(time, delta);
+
+		// this.ui.setScale(1/this.cameras.main.zoomX, 1/this.cameras.main.zoomY)
 	}
 
 
@@ -277,7 +277,7 @@ export class GameScene extends BaseScene {
 			this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
 		}
 
-		console.log(properties)
+		/* console.debug(properties) */
 
 		// Smooth camera room transition: false
 		if (!smoothCamera) {
