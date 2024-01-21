@@ -39,37 +39,37 @@ export class TitleScene extends BaseScene {
 		this.containToScreen(this.background);
 		this.foreground = this.add.image(this.CX, this.CY, "title_foreground");
 		this.containToScreen(this.foreground);
-		this.character = this.add.image(this.CX, this.CY, "title_character");
+		this.character = this.add.image(this.CX, this.CY - 300, "title_character");
 		this.containToScreen(this.character);
 
 		this.background.setVisible(false);
 		this.background.setAlpha(0);
-		this.background.y += 4000;
+		this.background.y += 500;
 		this.foreground.y += 1000;
-		this.character.y += 1000;
+		this.character.y -= 300;
 
 		this.title = this.addText({
 			x: 0.5 * this.W,
-			y: 0.7 * this.H,
+			y: 0.4 * this.H,
 			size: 130,
-			color: "#000",
+			color: "#aff",
 			text: title,
 		});
 		this.title.setOrigin(0.5);
-		this.title.setStroke("#FFF", 8);
+		this.title.setStroke("#035", 20);
 		this.title.setPadding(2);
 		this.title.setVisible(false);
 		this.title.setAlpha(0);
 
 		this.subtitle = this.addText({
 			x: 0.5 * this.W,
-			y: 0.87 * this.H,
+			y: 0.6 * this.H,
 			size: 80,
-			color: "#000",
+			color: "#7ce",
 			text: "Tap to start",
 		});
 		this.subtitle.setOrigin(0.5);
-		this.subtitle.setStroke("#FFF", 3);
+		this.subtitle.setStroke("#035", 16);
 		this.subtitle.setPadding(2);
 		this.subtitle.setVisible(false);
 		this.subtitle.setAlpha(0);
@@ -154,11 +154,11 @@ export class TitleScene extends BaseScene {
 
 		if (this.background.visible) {
 			this.background.y += 0.02 * (this.CY - this.background.y);
-			this.foreground.y += 0.025 * (this.CY - this.foreground.y);
+			this.foreground.y += 0.01 * (this.CY - this.foreground.y);
 			this.character.y += 0.02 * (this.CY - this.character.y);
 
 			this.background.alpha += 0.03 * (1 - this.background.alpha);
-			this.character.scaleX = Math.sin((3 * time) / 1000);
+			this.character.y += Math.sin((0.5 * time) / 1000) * -0.5;
 
 			this.title.alpha +=
 				0.02 * ((this.title.visible ? 1 : 0) - this.title.alpha);
@@ -212,7 +212,7 @@ export class TitleScene extends BaseScene {
 		if (bar >= 2) {
 			this.title.setVisible(true);
 		}
-		if (bar >= 4) {
+		if (bar >= 3) {
 			this.subtitle.setVisible(true);
 			this.credits.setVisible(true);
 		}
