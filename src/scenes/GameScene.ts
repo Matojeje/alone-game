@@ -40,6 +40,7 @@ export class GameScene extends BaseScene {
 		});
 
 		this.ui = new UI(this);
+		this.ui.setScrollFactor(0, 0, true)
 
 		this.footprints = this.add.group({
 			classType: Footprint,
@@ -63,17 +64,20 @@ export class GameScene extends BaseScene {
 			emitting: true,
 			emitZone: randomZoneFromShape(topLine),
 		})
+		this.snowflakes.setScrollFactor(0, 0)
 
 		this.loadTilemap();
 		this.changeRoom("Welcome");
 		this.initTouchControls();
 		this.setupZorder();
+
+		// this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
 	}
 
 	update(time: number, delta: number) {
 		this.player.update(time, delta);
 		this.checkRoom()
-		
+
 		if (this.roomChange) this.changeRoom(this.currentRoom)
 	}
 
@@ -96,8 +100,8 @@ export class GameScene extends BaseScene {
 
 			this.layers.set(name, layer)
 			if (collides) {
-				this.physics.add.collider(this.player, layer);
-				layer.setCollisionByProperty({collides});
+				this.physics.add.collider(this.player, layer, x => console.log(layer, x));
+				// layer.setCollisionByProperty({collides});
 			}
 		})
 		
@@ -145,7 +149,7 @@ export class GameScene extends BaseScene {
 
 		this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
 			if (!this.player.isTouched) {
-				this.player.touchStart(pointer.x, pointer.y);
+				this.player.touchStart(pointer.worldX, pointer.worldY);
 				touchId = pointer.id;
 				touchButton = pointer.button;
 			}
@@ -156,14 +160,14 @@ export class GameScene extends BaseScene {
 
 		this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
 			if (touchId == pointer.id) {
-				this.player.touchDrag(pointer.x, pointer.y);
+				this.player.touchDrag(pointer.worldX, pointer.worldY);
 			}
 		});
 
 		this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
 			if (touchId == pointer.id && touchButton == pointer.button) {
 				// this.ui.debug.setText(`${new Date().getTime()} - id:${pointer.id} button:${pointer.button}`);
-				this.player.touchEnd(pointer.x, pointer.y);
+				this.player.touchEnd(pointer.worldX, pointer.worldY);
 			}
 		});
 	}

@@ -22,7 +22,7 @@ export class Player extends Phaser.GameObjects.Container {
 	public arcadeBody: Phaser.Physics.Arcade.Body;
 
 	// Controls
-	private keyboard: any;
+	public keyboard: any;
 	public isTouched: boolean;
 	public isTapped: boolean;
 	private tappedTimer: number;
@@ -214,7 +214,8 @@ export class Player extends Phaser.GameObjects.Container {
 	}
 
 	doABarrelRoll() {
-		if (!this.tween || !this.tween.isActive()) {
+		console.count("Whee")
+		/* if (!this.tween || !this.tween.isActive()) {
 			this.tween = this.scene.tweens.add({
 				targets: this.sprite,
 				scaleX: {
@@ -225,7 +226,7 @@ export class Player extends Phaser.GameObjects.Container {
 				duration: 300,
 				yoyo: true,
 			});
-		}
+		} */
 	}
 
 	setupAnimations() {
