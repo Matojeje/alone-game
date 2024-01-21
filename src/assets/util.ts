@@ -64,3 +64,5 @@ export const randomZoneFromShape = (shape: ObjectWithRandomPoint) => new Phaser.
 		point.y = newPoint.y;
 	},
 })
+
+export const clone = (source: any) => JSON.parse(JSON.stringify(source))

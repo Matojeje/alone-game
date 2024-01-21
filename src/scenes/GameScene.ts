@@ -2,7 +2,7 @@ import { BaseScene } from "@/scenes/BaseScene";
 import { Player } from "@/components/Player";
 import { Footprint } from "@/components/Footprint";
 import { UI } from "@/components/UI";
-import { randomZoneFromShape } from '../assets/util';
+import { clone, randomZoneFromShape } from '../assets/util';
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -66,6 +66,8 @@ export class GameScene extends BaseScene {
 		})
 		this.snowflakes.setScrollFactor(0, 0)
 
+		this.previousRoom = ""
+
 		this.loadTilemap();
 		this.changeRoom("Welcome");
 		this.initTouchControls();
@@ -95,6 +97,7 @@ export class GameScene extends BaseScene {
 		
 		this.layers = new Map();
 		layers.forEach(({name, collides}) => {
+			this.tilemap.setCollisionFromCollisionGroup()
 			const layer = this.tilemap.createLayer(name, tileset);
 			if (layer == null) throw new Error("Layer creation error");
 
@@ -123,6 +126,7 @@ export class GameScene extends BaseScene {
 				case "Spawn":
 					if (obj.x) this.player.x = obj.x
 					if (obj.y) this.player.y = obj.y
+					break;
 
 				default:
 					console.warn("Unknown object type", obj.type)
@@ -240,20 +244,35 @@ export class GameScene extends BaseScene {
 	}
 
 	changeRoom(roomName = "Welcome") {
-		const room = this.rooms.get(roomName)
+		const room = this.roomAreas.get(roomName)
 		if (!room) {
 			console.warn("Room not found")
 			return
 		}
 
-		this.currentRoom = room.name;
+		this.currentRoom = roomName;
+		const prev = clone(this.roomAreas.get(this.previousRoom) ?? {x: 0, y: 0, width: 0, height: 0}) as Phaser.Geom.Rectangle
 
-		this.cameras.main.setBounds(
-			room.x ?? 0,
-			room.y ?? 0,
-			room.width ?? this.W,
-			room.height ?? this.H,
-		)
+		/* let x, y, w, h;
+
+		this.tweens.add({
+			targets: [x, y, w, h],
+			from: [prev.x, prev.y, prev.width, prev.height],
+			to: [room.x, room.y, room.width, room.height],
+			onUpdate: (tween, target, key, current, previous, param) => {}
+		})
+		this.cameras.main.setBounds(room.x, room.y, room.width, room.height) */
+
+		this.tweens.add({
+			ease: "Expo",
+			duration: 200,
+			targets: prev,
+			x: {from: prev.x, to: room.x},
+			y: {from: prev.y, to: room.y},
+			width: {from: prev.width, to: room.width},
+			height: {from: prev.height, to: room.width},
+			onUpdate: (tween, t) => this.cameras.main.setBounds(t.x, t.y, t.width, t.height)
+		})
 	}
 
 	getRoom(rect: Phaser.Geom.Rectangle) {
