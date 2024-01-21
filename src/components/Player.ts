@@ -111,21 +111,22 @@ export class Player extends Phaser.GameObjects.Container {
 				this.isTapped = false;
 			}
 		} else {
-			this.velocity.scale(FRICTION);
-			this.velocity.add(this.inputVec);
-			this.velocity.limit(MAX_SPEED);
+			this.arcadeBody.velocity.scale(FRICTION);
+			this.arcadeBody.velocity.add(this.inputVec);
+			this.arcadeBody.velocity.limit(MAX_SPEED);
 		}
 
-		this.x += (this.velocity.x * delta) / 1000;
-		this.y += (this.velocity.y * delta) / 1000;
+		// this.x += (this.velocity.x * delta) / 1000;
+		// this.y += (this.velocity.y * delta) / 1000;
 
 		// Spritesheet animation
 		const isMoving = this.inputVec.length() > 0.05;
 		const isMovingX = Math.abs(this.inputVec.x) > 0.05;
 		const isMovingY = Math.abs(this.inputVec.y) > 0.05;
 
+		const facingUp = this.inputVec.normalize().y >= -0.3;
 		if (isMovingX) this.lastDirection.hor = this.inputVec.x >= 0 ? RIGHT : LEFT;
-		if (isMovingY) this.lastDirection.ver = this.inputVec.y >= 0 ? DOWN : UP;
+		if (isMovingY) this.lastDirection.ver = facingUp			 ? DOWN : UP;
 
 		this.sprite.play(`${isMoving ? "walk" : "idle"}-${this.lastDirection.ver == DOWN ? "front" : "back"}`, true)
 
@@ -172,7 +173,7 @@ export class Player extends Phaser.GameObjects.Container {
 			// if (this.inputVec.length() < 8) {
 			// this.inputVec.reset();
 			// }
-			this.inputVec.scale(1 / 50);
+			this.inputVec.scale(1 / 200);
 		}
 	}
 

@@ -103,8 +103,9 @@ export class GameScene extends BaseScene {
 
 			this.layers.set(name, layer)
 			if (collides) {
-				this.physics.add.collider(this.player, layer, x => console.log(layer, x));
-				// layer.setCollisionByProperty({collides});
+				console.log("Adding collider for", name)
+				this.physics.add.collider(this.player, layer);
+				layer.setCollisionFromCollisionGroup(true)
 			}
 		})
 		
