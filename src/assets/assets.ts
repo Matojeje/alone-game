@@ -12,6 +12,7 @@ const images: Image[] = [
 	// Particles
 	image('particles/footprint', 'footprint'),
 	image('particles/snowflake', 'snowflake'),
+	image('particles/sparkle', 'sparkle'),
 
 	// Items
 	image('items/coin', 'coin'),

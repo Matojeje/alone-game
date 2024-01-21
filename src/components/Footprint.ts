@@ -4,8 +4,9 @@ export class Footprint extends Phaser.GameObjects.Container {
     public scene: GameScene;
     public aliveTime: number;
     public index: number;
+    public roomName: string | undefined;
 
-	private sprite: Phaser.GameObjects.Sprite;
+	public sprite: Phaser.GameObjects.Sprite;
 	private spriteSize: number;
 
 	constructor(scene: GameScene, x: number, y: number) {
@@ -27,5 +28,9 @@ export class Footprint extends Phaser.GameObjects.Container {
     update(time: number, delta: number) {
         this.aliveTime += delta;
         // if (this.aliveTime > 10_000) {this.destroy()}
+
+        this.roomName = this.scene.getRoom(
+            new Phaser.Geom.Rectangle(this.x, this.y, 1, 1)
+        )
     }
 }

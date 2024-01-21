@@ -1,6 +1,7 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { Player } from "@/components/Player";
 import { Footprint } from "@/components/Footprint";
+import { Sparkle } from "@/components/Sparkle";
 import { UI } from "@/components/UI";
 import { clone, randomZoneFromShape } from '../assets/util';
 
@@ -20,6 +21,8 @@ export class GameScene extends BaseScene {
 	private previousRoom: string;
 	private currentRoom: string;
 	private roomChange: boolean;
+
+	private sparkles: Map<number, Sparkle>;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -81,7 +84,7 @@ export class GameScene extends BaseScene {
 		if (this.roomChange) this.changeRoom(this.currentRoom)
 		this.ui.update(time, delta);
 
-		// this.ui.setScale(1/this.cameras.main.zoomX, 1/this.cameras.main.zoomY)
+		this.sparkles.forEach(s => s.update(time, delta, this.player.getColliderBounds()))
 	}
 
 
@@ -116,6 +119,7 @@ export class GameScene extends BaseScene {
 		// Read map objects
 		this.rooms = new Map();
 		this.roomAreas = new Map();
+		this.sparkles = new Map();
 
 		this.tilemap.objects.find(objLayer => objLayer.name == "Objects")
 		?.objects.forEach(obj => {
@@ -128,6 +132,11 @@ export class GameScene extends BaseScene {
 				case "Spawn":
 					if (obj.x) this.player.x = obj.x
 					if (obj.y) this.player.y = obj.y
+					break;
+
+				case "Sparkle":
+					const sparkle = new Sparkle(this, obj.id, new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height))
+					this.sparkles.set(obj.id, sparkle)
 					break;
 
 				default:
@@ -338,5 +347,17 @@ export class GameScene extends BaseScene {
 		return this.tilemap.getTileLayerNames().map(layer => {
 			return this.tilemap.getTileAtWorldXY(x, y, false, undefined, layer) as Phaser.Tilemaps.Tile
 		}).filter(x => x != null)
+	}
+
+	sparkleEffect(obj: Sparkle) {
+		const roomName = this.getRoom(obj.area)
+		if (!roomName) return console.warn(`Sparkle ${obj.id} activated outside a room`)
+
+		const footprints = this.footprints.getChildren().filter(go => {
+			const ft = go as Footprint
+			return ft.roomName == roomName
+		}) as Footprint[]
+
+		footprints.forEach(ft => ft.sprite.setTint(0xff0000))
 	}
 }

@@ -1169,6 +1169,6 @@
     <property name="staticCamera" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="13" name="Sparkle zone" type="Sparkle" x="8000" y="1600" width="512" height="64"/>
+  <object id="13" name="Sparkle zone" type="Sparkle" x="8000" y="1561.33" width="512" height="82.6667"/>
  </objectgroup>
 </map>
