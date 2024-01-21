@@ -13,9 +13,6 @@ const images: Image[] = [
 	image('particles/snowflake', 'snowflake'),
 	image('particles/sparkle', 'sparkle'),
 
-	// Items
-	image('items/coin', 'coin'),
-
 	// UI
 	image('ui/hud', 'hud'),
 
@@ -35,9 +32,8 @@ const spritesheets: SpriteSheet[] = [
 
 /* Audios */
 const audios: Audio[] = [
-	music('title', 'm_main_menu'),
-	music('first', 'm_first'),
-	sound('tree/rustle', 't_rustle', 0.5),
+	music('bgm', 'bgm'),
+	// sound('tree/rustle', 't_rustle', 0.5),
 ];
 
 /* Levels */

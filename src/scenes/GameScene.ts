@@ -2,13 +2,17 @@ import { BaseScene } from "@/scenes/BaseScene";
 import { Player } from "@/components/Player";
 import { Footprint } from "@/components/Footprint";
 import { Sparkle } from "@/components/Sparkle";
+import { Music } from "@/components/Music";
 import { UI } from "@/components/UI";
 import { RGBtoInteger, clone, randomZoneFromShape } from '../assets/util';
 
 export class GameScene extends BaseScene {
+	private debug: boolean;
+
 	private background: Phaser.GameObjects.Image;
 	private player: Player;
 	private ui: UI;
+	private music: Phaser.Sound.WebAudioSound;
 	private footprints: Phaser.GameObjects.Group;
 	private totalSteps: number;
 	private snowflakes: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -39,7 +43,8 @@ export class GameScene extends BaseScene {
 		super({ key: "GameScene" });
 	}
 
-	create(): void {
+	create(debug=false): void {
+		this.debug = debug;
 		this.fade(false, 200, 0x000000);
 
 		// this.background = this.add.image(0, 0, "background");
@@ -83,6 +88,9 @@ export class GameScene extends BaseScene {
 		this.previousRoom = ""
 		this.magicResults = []
 
+		if (!this.music) this.music = new Music(this, "bgm", { volume: 0.4 });
+		this.music.play();
+
 		this.resetMagic();
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
@@ -102,8 +110,8 @@ export class GameScene extends BaseScene {
 
 		// This should **really** be in a separate component
 		this.magicResults.forEach((m, i, a) => {
-			const period = 6000 // ms
-			const periodActive = 0.2 * period
+			const period = 5500 // ms
+			const periodActive = 0.25 * period
 			const offset = m.object.index / a.length * period
 			const cycle = (time+offset) % period
 			m.collider.active = (cycle > periodActive)
@@ -166,19 +174,24 @@ export class GameScene extends BaseScene {
 
 		this.tilemap.objects.find(objLayer => objLayer.name == "Objects")
 		?.objects.forEach(obj => {
+			const area = new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height)
 			switch (obj.type) {
 				case "Room":
 					this.rooms.set(obj.name, obj)
-					this.roomAreas.set(obj.name, new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height))
+					this.roomAreas.set(obj.name, area)
 					break;
 			
 				case "Spawn":
 					if (obj.x) this.player.x = obj.x
 					if (obj.y) this.player.y = obj.y
 					break;
+				
+				case "Debug":
+					if (this.debug == true && !!obj.x) this.player.x = obj.x
+					if (this.debug == true && !!obj.y) this.player.y = obj.y
+					break;
 
 				case "Sparkle":
-					const area = new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height)
 					const destination: any = obj.properties.find((x: any) => x.name == "destination")
 
 					if (!obj.properties || destination == undefined || !destination.value)
@@ -188,6 +201,10 @@ export class GameScene extends BaseScene {
 						this.sparkles.set(obj.id, sparkle)
 					}
 
+					break;
+
+				case "Trigger":
+					// this.physics.add.overlap(area, this.player, e => console.log(e))
 					break;
 
 				default:
@@ -337,8 +354,7 @@ export class GameScene extends BaseScene {
 		}
 
 		/* console.debug(properties) */
-
-		console.debug([this.previousRoom, this.currentRoom, this.magic.origin, this.magic.destination])
+		/* console.debug([this.previousRoom, this.currentRoom, this.magic.origin, this.magic.destination]) */
 
 		// Magic footstep handling
 		if (this.previousRoom == this.magic.origin &&
@@ -359,6 +375,7 @@ export class GameScene extends BaseScene {
 
 			// This should really be in a separate component
 			this.magic.prints.forEach(m => {
+				m.magical = false
 				this.tweens.add({
 					ease: Phaser.Math.RND.pick(["Expo", "Quint", "Quart", "Circ", "Back.out", "Back.inOut"]),
 					duration: Phaser.Math.RND.between(300, 700),
@@ -415,7 +432,7 @@ export class GameScene extends BaseScene {
 			})
 
 			// this.magicResults.push(...this.magic.prints)
-			this.resetMagic() 
+			setTimeout(() => this.resetMagic(), 3000);
 		}
 
 		// Smooth camera room transition: false

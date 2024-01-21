@@ -19,11 +19,8 @@ export class TitleScene extends BaseScene {
 	public tap: Phaser.GameObjects.Text;
 	public version: Phaser.GameObjects.Text;
 
-	public musicTitle: Phaser.Sound.WebAudioSound;
-	public select: Phaser.Sound.WebAudioSound;
-	public select2: Phaser.Sound.WebAudioSound;
-
 	public isStarting: boolean;
+	public timeTapped: number;
 
 	constructor() {
 		super({ key: "TitleScene" });
@@ -52,9 +49,9 @@ export class TitleScene extends BaseScene {
 		this.character.y += 1000;
 
 		this.title = this.addText({
-			x: 0.25 * this.W,
+			x: 0.5 * this.W,
 			y: 0.7 * this.H,
-			size: 160,
+			size: 130,
 			color: "#000",
 			text: title,
 		});
@@ -65,9 +62,9 @@ export class TitleScene extends BaseScene {
 		this.title.setAlpha(0);
 
 		this.subtitle = this.addText({
-			x: 0.25 * this.W,
+			x: 0.5 * this.W,
 			y: 0.87 * this.H,
-			size: 120,
+			size: 80,
 			color: "#000",
 			text: "Tap to start",
 		});
@@ -80,7 +77,7 @@ export class TitleScene extends BaseScene {
 		this.tap = this.addText({
 			x: this.CX,
 			y: this.CY,
-			size: 140,
+			size: 90,
 			color: "#000",
 			text: "Tap to focus",
 		});
@@ -131,14 +128,6 @@ export class TitleScene extends BaseScene {
 		credits2.setOrigin(1, 0);
 		this.credits.add(credits2);
 
-		// Music
-		if (!this.musicTitle) {
-			this.musicTitle = new Music(this, "m_first", { volume: 0.4 });
-			this.musicTitle.on("bar", this.onBar, this);
-			this.musicTitle.on("beat", this.onBeat, this);
-		}
-		this.musicTitle.play();
-
 		// Input
 
 		this.input.keyboard
@@ -159,7 +148,9 @@ export class TitleScene extends BaseScene {
 	update(time: number, delta: number) {
 
 		// Debug only!
-		this.scene.start("GameScene");
+		// this.scene.start("GameScene");
+
+		this.onBar((time-this.timeTapped)/1000)
 
 		if (this.background.visible) {
 			this.background.y += 0.02 * (this.CY - this.background.y);
@@ -182,7 +173,8 @@ export class TitleScene extends BaseScene {
 		} else {
 			this.tap.alpha += 0.01 * (1 - this.tap.alpha);
 
-			if (this.musicTitle.seek > 0) {
+			if (this.game.hasFocus || this.input.activePointer.isDown) {
+				if (!this.timeTapped) this.timeTapped = time
 				this.background.setVisible(true);
 				this.tap.setVisible(false);
 			}
@@ -204,14 +196,12 @@ export class TitleScene extends BaseScene {
 			this.subtitle.setVisible(true);
 			this.subtitle.setAlpha(1);
 		} else if (!this.isStarting) {
-			this.sound.play("t_rustle", { volume: 0.3 });
 			this.isStarting = true;
 			this.flash(3000, 0xffffff, 0.6);
 
 			this.addEvent(1000, () => {
 				this.fade(true, 1000, 0x000000);
 				this.addEvent(1050, () => {
-					this.musicTitle.stop();
 					this.scene.start("GameScene");
 				});
 			});
@@ -226,9 +216,5 @@ export class TitleScene extends BaseScene {
 			this.subtitle.setVisible(true);
 			this.credits.setVisible(true);
 		}
-	}
-
-	onBeat(time: number) {
-		// this.select.play();
 	}
 }

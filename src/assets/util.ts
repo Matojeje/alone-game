@@ -31,14 +31,14 @@ export const spritesheet = (path: string, key: string, width: number, height: nu
 	return { key, width, height, path: imageGlob[`./images/${path}.png`] };
 }
 
-const musicGlob = import.meta.glob('./music/**/*.mp3', {as: 'url', eager: true});
+const musicGlob = import.meta.glob('./music/**/*.ogg', {as: 'url', eager: true});
 export const music = (path: string, key: string, volume?: number, rate?: number): Audio => {
-	return { key, volume, rate, path: musicGlob[`./music/${path}.mp3`] };
+	return { key, volume, rate, path: musicGlob[`./music/${path}.ogg`] };
 }
 
-const audioGlob = import.meta.glob('./sounds/**/*.mp3', {as: 'url', eager: true});
+const audioGlob = import.meta.glob('./sounds/**/*.ogg', {as: 'url', eager: true});
 export const sound = (path: string, key: string, volume?: number, rate?: number): Audio => {
-	return { key, volume, rate, path: audioGlob[`./sounds/${path}.mp3`] };
+	return { key, volume, rate, path: audioGlob[`./sounds/${path}.ogg`] };
 }
 
 const levelGlob = import.meta.glob('./levels/**/*.json', {as: 'url', eager: true});
