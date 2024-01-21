@@ -15,7 +15,10 @@ export class GameScene extends BaseScene {
 	private tilemap: Phaser.Tilemaps.Tilemap;
 	private layers: Map<string, Phaser.Tilemaps.TilemapLayer>;
 	private rooms: Map<string, Phaser.Types.Tilemaps.TiledObject>;
+
+	private previousRoom: string;
 	private currentRoom: string;
+	private roomChange: boolean;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -68,6 +71,9 @@ export class GameScene extends BaseScene {
 
 	update(time: number, delta: number) {
 		this.player.update(time, delta);
+		this.checkRoom()
+		
+		if (this.roomChange) this.changeRoom(this.currentRoom)
 	}
 
 
@@ -78,8 +84,8 @@ export class GameScene extends BaseScene {
 
 		// Load layers
 		const layers = [
-			{name: "Wall",   collides: true},
-			{name: "Ground", collides: false},
+			{ name: "Wall",   collides: true  },
+			{ name: "Ground", collides: false },
 		]
 		
 		this.layers = new Map();
@@ -242,4 +248,38 @@ export class GameScene extends BaseScene {
 			room.height ?? this.H,
 		)
 	}
+
+	checkRoom() {
+        let playerRoom;
+
+		this.rooms.forEach(room => {
+            let roomLeft   = (room.x ?? 0);
+            let roomRight  = (room.x ?? 0) + (room.width ?? 0);
+            let roomTop    = (room.y ?? 0);
+            let roomBottom = (room.y ?? 0) + (room.height ?? 0);
+
+            // Player is within the boundaries of this room.
+            if (this.player.x > roomLeft && this.player.x < roomRight &&
+                this.player.y > roomTop  && this.player.y < roomBottom) {
+
+                playerRoom = room.name;
+
+                /* let visited = room.properties.find(function(property) {
+                    return property.name === 'visited';
+                } );
+
+                visited.value = true */
+            }
+        })
+
+		if (!playerRoom) return console.warn("Player not in any room")
+
+        if (playerRoom != this.currentRoom) {
+            this.previousRoom = this.currentRoom;
+            this.currentRoom = playerRoom;
+            this.roomChange = true;
+        } else {
+            this.roomChange = false;
+        }
+    }
 }
