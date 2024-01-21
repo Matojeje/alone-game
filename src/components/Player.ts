@@ -58,7 +58,7 @@ export class Player extends Phaser.GameObjects.Container {
 		this.setupAnimations();
 
 		/* Foot prints */
-		this.footprintSpacing = 100;
+		this.footprintSpacing = 85;
 		this.distanceWalked = 0;
 		this.distSinceLastFootprint = 0;
 		this.lastFootStepped = RIGHT;
@@ -89,8 +89,8 @@ export class Player extends Phaser.GameObjects.Container {
 
 		/* Physics */
 		this.arcadeBody = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
-        this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.2 * this.spriteSize);
-		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.2 * this.spriteSize)
+        this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.1 * this.spriteSize);
+		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.4 * this.spriteSize)
 
 		this.friction = FRICTION
 		

@@ -31,8 +31,6 @@ export class Sparkle extends Phaser.GameObjects.Container {
 			emitting: true,
 			emitZone: randomZoneFromShape(area),
 		})
-
-        console.log(this.particles)
 	}
 
     update(time: number, delta: number, playerBounds: Phaser.Geom.Rectangle) {
