@@ -1500,15 +1500,33 @@
                  "y":1728
                 }, 
                 {
-                 "height":64,
+                 "height":82.6666666666667,
                  "id":13,
                  "name":"Sparkle zone",
+                 "properties":[
+                        {
+                         "name":"destination",
+                         "type":"string",
+                         "value":"Icy steps"
+                        }],
                  "rotation":0,
                  "type":"Sparkle",
                  "visible":true,
                  "width":512,
                  "x":8000,
-                 "y":1600
+                 "y":1561.33333333333
+                }, 
+                {
+                 "height":0,
+                 "id":14,
+                 "name":"Spawn point",
+                 "point":true,
+                 "rotation":0,
+                 "type":"Spawn",
+                 "visible":true,
+                 "width":0,
+                 "x":6592,
+                 "y":1280
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1517,7 +1535,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":14,
+ "nextobjectid":15,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
@@ -1542,7 +1560,8 @@
                          "name":"footprints",
                          "type":"bool",
                          "value":true
-                        }]
+                        }],
+                 "type":"snow"
                 }, 
                 {
                  "id":1,
@@ -1551,7 +1570,8 @@
                          "name":"footprints",
                          "type":"bool",
                          "value":false
-                        }]
+                        }],
+                 "type":"brick"
                 }, 
                 {
                  "id":2,
@@ -1588,7 +1608,8 @@
                      "visible":true,
                      "x":0,
                      "y":0
-                    }
+                    },
+                 "type":"wall"
                 }, 
                 {
                  "id":3,
@@ -1597,7 +1618,8 @@
                          "name":"slippery",
                          "type":"bool",
                          "value":true
-                        }]
+                        }],
+                 "type":"ice"
                 }],
          "tilewidth":64
         }],
