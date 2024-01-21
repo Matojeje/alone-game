@@ -1,6 +1,14 @@
-# Chocobois Game Jam Template
+# Snowy trails
 
-We make game, but faster
+A short walk in a snowy forest where you make your own obstacles!
+
+Made for a [university-held game jam](https://cphoto.fit.vutbr.cz/ludo/courses/izhv/final/gj/) in 2024.
+
+## Credits
+
+- Art, music, code: @Matojeje
+- Font: https://github.com/TypeTogether/Playpen-Sans
+- Game jam template: @Chocobois
 
 ## Quick start
 ### Prerequisites

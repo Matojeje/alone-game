@@ -78,12 +78,12 @@ export class TitleScene extends BaseScene {
 			x: this.CX,
 			y: this.CY,
 			size: 90,
-			color: "#000",
+			color: "#fff",
 			text: "Tap to focus",
 		});
 		this.tap.setOrigin(0.5);
 		this.tap.setAlpha(-1);
-		this.tap.setStroke("#FFF", 4);
+		this.tap.setStroke("#14d", 6);
 		this.tap.setPadding(2);
 
 		this.version = this.addText({
@@ -106,10 +106,10 @@ export class TitleScene extends BaseScene {
 			x: 0.65 * this.W,
 			y: 0,
 			size: 40,
-			color: "#c2185b",
+			color: "#fff",
 			text: creditsLeft,
 		});
-		credits1.setStroke("#FFF", 10);
+		credits1.setStroke("#1d50d3", 10);
 		credits1.setPadding(2);
 		credits1.setLineSpacing(0);
 		this.credits.add(credits1);
@@ -118,10 +118,10 @@ export class TitleScene extends BaseScene {
 			x: this.W,
 			y: 0,
 			size: 40,
-			color: "#c2185b",
+			color: "#fff",
 			text: creditsRight,
 		});
-		credits2.setStroke("#FFF", 10);
+		credits2.setStroke("#1d50d3", 10);
 		credits2.setPadding(2);
 		credits2.setLineSpacing(0);
 		credits2.setAlign("right");
