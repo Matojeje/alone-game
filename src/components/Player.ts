@@ -19,7 +19,7 @@ export class Player extends Phaser.GameObjects.Container {
 	private tween: Phaser.Tweens.Tween;
 
 	// Physics
-
+	public arcadeBody: Phaser.Physics.Arcade.Body;
 
 	// Controls
 	private keyboard: any;
@@ -87,11 +87,11 @@ export class Player extends Phaser.GameObjects.Container {
 		this.velocity = new Phaser.Math.Vector2(0, 0);
 
 		/* Physics */
-		this.body = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
-		this.body.setCollideWorldBounds(true);
-        this.body.setOffset(-0.2 * this.spriteSize, 0.3 * this.spriteSize);
+		this.arcadeBody = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
+		this.arcadeBody.setCollideWorldBounds(true);
+        this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.3 * this.spriteSize);
 		
-		this.body.setSize(0.4 * this.spriteSize, 0.1 * this.spriteSize)
+		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.1 * this.spriteSize)
 		
 	}
 
@@ -267,5 +267,11 @@ export class Player extends Phaser.GameObjects.Container {
 				+ (this.lastDirection.ver ? 20 : -20)
 			)
 		}
+	}
+
+	getColliderBounds() {
+		let temp = new Phaser.Geom.Rectangle;
+		this.arcadeBody.getBounds(temp as Phaser.Types.Physics.Arcade.ArcadeBodyBounds)
+		return temp
 	}
 }

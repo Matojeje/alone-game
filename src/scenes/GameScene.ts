@@ -15,6 +15,7 @@ export class GameScene extends BaseScene {
 	private tilemap: Phaser.Tilemaps.Tilemap;
 	private layers: Map<string, Phaser.Tilemaps.TilemapLayer>;
 	private rooms: Map<string, Phaser.Types.Tilemaps.TiledObject>;
+	private roomAreas: Map<string, Phaser.Geom.Rectangle>;
 
 	private previousRoom: string;
 	private currentRoom: string;
@@ -105,12 +106,14 @@ export class GameScene extends BaseScene {
 		
 		// Read map objects
 		this.rooms = new Map();
+		this.roomAreas = new Map();
 
 		this.tilemap.objects.find(objLayer => objLayer.name == "Objects")
 		?.objects.forEach(obj => {
 			switch (obj.type) {
 				case "Room":
 					this.rooms.set(obj.name, obj)
+					this.roomAreas.set(obj.name, new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height))
 					break;
 			
 				case "Spawn":
@@ -249,28 +252,18 @@ export class GameScene extends BaseScene {
 		)
 	}
 
+	getRoom(rect: Phaser.Geom.Rectangle) {
+		return ([...this.rooms.keys()].reverse().find(name => 
+			Phaser.Geom.Intersects.RectangleToRectangle(
+				this.roomAreas.get(name) as Phaser.Geom.Rectangle,
+				rect
+			)
+		))
+	}
+
 	checkRoom() {
-        let playerRoom;
 
-		this.rooms.forEach(room => {
-            let roomLeft   = (room.x ?? 0);
-            let roomRight  = (room.x ?? 0) + (room.width ?? 0);
-            let roomTop    = (room.y ?? 0);
-            let roomBottom = (room.y ?? 0) + (room.height ?? 0);
-
-            // Player is within the boundaries of this room.
-            if (this.player.x > roomLeft && this.player.x < roomRight &&
-                this.player.y > roomTop  && this.player.y < roomBottom) {
-
-                playerRoom = room.name;
-
-                /* let visited = room.properties.find(function(property) {
-                    return property.name === 'visited';
-                } );
-
-                visited.value = true */
-            }
-        })
+		const playerRoom = this.getRoom(this.player.getColliderBounds())
 
 		if (!playerRoom) return console.warn("Player not in any room")
 

@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { PreloadScene } from "@/scenes/PreloadScene";
 import { TitleScene } from "@/scenes/TitleScene";
 import { GameScene } from "@/scenes/GameScene";
-import { title, version } from "@/version.json";
+import { title, count } from "@/version.json";
 import OutlinePipelinePlugin from "phaser3-rex-plugins/plugins/outlinepipeline-plugin.js";
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,7 +16,7 @@ const config: Phaser.Types.Core.GameConfig = {
 	},
 	scene: [PreloadScene, TitleScene, GameScene],
 	title,
-	version,
+	version: count,
 
 	physics: {
         default: 'arcade',
