@@ -45,7 +45,7 @@ const levels: Level[] = [
 ]
 
 /* Fonts */
-await loadFont('Sketch', 'Game Font');
+await loadFont('PlaypenSans-SemiBold', 'Game Font');
 
 export {
 	images,

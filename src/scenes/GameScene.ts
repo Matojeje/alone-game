@@ -81,6 +81,7 @@ export class GameScene extends BaseScene {
 		this.checkRoom()
 
 		if (this.roomChange) this.changeRoom(this.currentRoom)
+		this.ui.update(time, delta);
 	}
 
 
@@ -103,7 +104,7 @@ export class GameScene extends BaseScene {
 
 			this.layers.set(name, layer)
 			if (collides) {
-				console.log("Adding collider for", name)
+				// console.debug("Adding collider for", name)
 				this.physics.add.collider(this.player, layer);
 				layer.setCollisionFromCollisionGroup(true)
 			}
@@ -258,6 +259,8 @@ export class GameScene extends BaseScene {
 		}
 
 		this.currentRoom = roomName;
+		this.ui.showPanel(roomName, 3000);
+
 		const prev = clone(
 			this.roomAreas.get(this.previousRoom) ??
 			{x: 0, y: 0, width: 0, height: 0}
