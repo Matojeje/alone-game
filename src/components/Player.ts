@@ -1,9 +1,9 @@
 import { GameScene } from "@/scenes/GameScene";
 
-const ACCELERATION = 150;
-const MAX_SPEED = 400;
+const ACCELERATION = 160;
+const MAX_SPEED = 500;
 const FRICTION = 0.7;
-const TAPPING_TIMER = 200; // ms
+const TAPPING_TIMER = 50; // ms
 const DOWN = true, UP = false, RIGHT = true, LEFT = false;
 console.assert(
 	ACCELERATION / (1 - FRICTION) >= MAX_SPEED,
@@ -88,7 +88,7 @@ export class Player extends Phaser.GameObjects.Container {
 
 		/* Physics */
 		this.arcadeBody = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
-		this.arcadeBody.setCollideWorldBounds(true);
+		// this.arcadeBody.setCollideWorldBounds(true);
         this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.3 * this.spriteSize);
 		
 		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.1 * this.spriteSize)
@@ -115,9 +115,6 @@ export class Player extends Phaser.GameObjects.Container {
 			this.arcadeBody.velocity.add(this.inputVec);
 			this.arcadeBody.velocity.limit(MAX_SPEED);
 		}
-
-		// this.x += (this.velocity.x * delta) / 1000;
-		// this.y += (this.velocity.y * delta) / 1000;
 
 		// Spritesheet animation
 		const isMoving = this.inputVec.length() > 0.05;

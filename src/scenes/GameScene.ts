@@ -69,7 +69,7 @@ export class GameScene extends BaseScene {
 		this.previousRoom = ""
 
 		this.loadTilemap();
-		this.changeRoom("Welcome");
+		this.changeRoom("Welcome", false);
 		this.initTouchControls();
 		this.setupZorder();
 
@@ -251,16 +251,42 @@ export class GameScene extends BaseScene {
 		this.ui			.setDepth(100)
 	}
 
-	changeRoom(roomName = "Welcome") {
+	changeRoom(roomName = "Welcome", smoothCamera = true) {
 		const room = this.roomAreas.get(roomName)
 		if (!room) {
 			console.warn("Room not found")
 			return
 		}
 
+		// Show room name
 		this.currentRoom = roomName;
 		this.ui.showPanel(roomName, 3000);
 
+		// Load room properties
+		const roomData = this.rooms.get(roomName)
+		let properties: any = {staticCamera: false, zoom: 1.0}
+
+		if (roomData?.properties) {
+			// roomData.properties.find((prop: any) => prop.name == "staticCamera").value
+			roomData.properties.forEach((prop: any) => properties[prop.name] = prop.value)
+		}
+		
+		if (properties.staticCamera == true) {
+			this.cameras.main.stopFollow()
+		} else {
+			this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
+		}
+
+		console.log(properties)
+
+		// Smooth camera room transition: false
+		if (!smoothCamera) {
+			this.cameras.main.setZoom(properties.zoom)
+			this.cameras.main.setBounds(room.x, room.y, room.width, room.height)
+			return
+		}
+
+		// Smooth camera room transition: true
 		const prev = clone(
 			this.roomAreas.get(this.previousRoom) ??
 			{x: 0, y: 0, width: 0, height: 0}
@@ -273,8 +299,15 @@ export class GameScene extends BaseScene {
 			x: {from: prev.x, to: room.x},
 			y: {from: prev.y, to: room.y},
 			width: {from: prev.width, to: room.width},
-			height: {from: prev.height, to: room.width},
+			height: {from: prev.height, to: room.height},
 			onUpdate: (tween, t) => this.cameras.main.setBounds(t.x, t.y, t.width, t.height)
+		})
+
+		this.tweens.add({
+			ease: "Quad",
+			duration: 200,
+			targets: this.cameras.main,
+			zoom: {from: clone(this.cameras.main.zoom), to: properties.zoom},
 		})
 	}
 
