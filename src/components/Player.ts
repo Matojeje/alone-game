@@ -89,8 +89,8 @@ export class Player extends Phaser.GameObjects.Container {
 
 		/* Physics */
 		this.arcadeBody = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
-        this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.3 * this.spriteSize);
-		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.1 * this.spriteSize)
+        this.arcadeBody.setOffset(-0.2 * this.spriteSize, 0.2 * this.spriteSize);
+		this.arcadeBody.setSize(0.4 * this.spriteSize, 0.2 * this.spriteSize)
 
 		this.friction = FRICTION
 		
@@ -278,6 +278,13 @@ export class Player extends Phaser.GameObjects.Container {
 	
 	public set slipping(state: boolean) {
 		this.friction = state ? 20 : FRICTION;
+	}
+
+	hurt() {
+		this.sprite.setTint(0xff8888);
+		setTimeout(() => {
+			this.sprite.setTint(0xffffff);
+		}, 300);
 	}
 	
 }

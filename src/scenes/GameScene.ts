@@ -29,7 +29,11 @@ export class GameScene extends BaseScene {
 		prints: Footprint[],
 	};
 
-	private magicResults: Phaser.GameObjects.Container[];
+	private magicResults: Array<{
+		object: Footprint,
+		body: Phaser.Physics.Arcade.Body,
+		collider: Phaser.Physics.Arcade.Collider
+	}>;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -95,6 +99,27 @@ export class GameScene extends BaseScene {
 
 		this.magic.prints.forEach(m => m.update(time, delta))
 		this.sparkles.forEach(s => s.update(time, delta, this.player.getColliderBounds()))
+
+		// This should **really** be in a separate component
+		this.magicResults.forEach((m, i, a) => {
+			const period = 6000 // ms
+			const periodActive = 0.2 * period
+			const offset = m.object.index / a.length * period
+			const cycle = (time+offset) % period
+			m.collider.active = (cycle > periodActive)
+			
+			const playerTouched = Phaser.Geom.Intersects.RectangleToRectangle(
+				m.object.getBounds(),
+				this.player.getColliderBounds()
+			)
+
+			if (cycle < 100)
+				m.object.sprite.play("lower", true)
+			else if (cycle > periodActive && cycle < periodActive+100) {
+				m.object.sprite.play("raise", true)
+				if (playerTouched) this.player.hurt()
+			}
+		})
 	}
 
 	resetMagic() {
@@ -332,10 +357,7 @@ export class GameScene extends BaseScene {
 				return !wallBlocked
 			})
 
-			const xs = this.magic.prints.map(m => m.x)
-			const ys = this.magic.prints.map(m => m.y)
-			const minX = Math.min(...xs), minY = Math.min(...ys)
-
+			// This should really be in a separate component
 			this.magic.prints.forEach(m => {
 				this.tweens.add({
 					ease: Phaser.Math.RND.pick(["Expo", "Quint", "Quart", "Circ", "Back.out", "Back.inOut"]),
@@ -348,8 +370,7 @@ export class GameScene extends BaseScene {
 					rotation: {from: clone(m.rotation), to: 0},
 
 					onComplete: () => {
-						this.magicResults.push(m)
-						
+
 						const tint = Phaser.Display.Color.HSLToColor(
 							Phaser.Math.RND.realInRange(185/360, 225/360),
 							Phaser.Math.RND.realInRange(0.6, 0.9),
@@ -357,6 +378,11 @@ export class GameScene extends BaseScene {
 						)
 
 						m.sprite.play("spike")
+						const body = this.physics.add.existing(m, true).body as Phaser.Physics.Arcade.Body
+						body.setCircle(this.tilemap.tileWidth*0.6, -this.tilemap.tileWidth*0.6, -this.tilemap.tileHeight*0.8)
+						const collider = this.physics.add.collider(this.player, m);
+
+						this.magicResults.push({object: m, body, collider})
 
 						this.tweens.add({
 							ease: "Quint.inOut",
@@ -365,6 +391,7 @@ export class GameScene extends BaseScene {
 
 							scaleX: {from: clone(m.sprite.scale), to: clone(m.sprite.scale) * 2},
 							scaleY: {from: clone(m.sprite.scale), to: clone(m.sprite.scale) * 4},
+							originY: {from: 0.5, to: 1},
 						})
 
 						this.tweens.add({
@@ -436,7 +463,10 @@ export class GameScene extends BaseScene {
 
 		const playerRoom = this.getRoom(this.player.getColliderBounds())
 
-		if (!playerRoom) return console.warn("Player not in any room")
+		if (!playerRoom) {
+			this.ui.showPanel("Out of bounds!", 100)
+			return console.warn("Player not in any room")
+		}
 
         if (playerRoom != this.currentRoom) {
             this.previousRoom = this.currentRoom;
@@ -481,13 +511,13 @@ export class GameScene extends BaseScene {
 
 		this.anims.create({
 			key: "lower", repeat: 0, frames: [15,14,13,12,11].map(n => {
-				return {key: "footprint", frame: n, duration: 1000/40}
+				return {key: "footprint", frame: n, duration: 1000/60}
 			})
 		})
 
 		this.anims.create({
-			key: "raise", repeat: 0, frames: [15,14,13,12,11].map(n => {
-				return {key: "footprint", frame: n, duration: 1000/40}
+			key: "raise", repeat: 0, frames: [11,12,13,14,15].map(n => {
+				return {key: "footprint", frame: n, duration: 1000/60}
 			})
 		})
 	}
