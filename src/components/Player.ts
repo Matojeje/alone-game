@@ -18,6 +18,9 @@ export class Player extends Phaser.GameObjects.Container {
 	private sprite: Phaser.GameObjects.Sprite;
 	private tween: Phaser.Tweens.Tween;
 
+	// Physics
+
+
 	// Controls
 	private keyboard: any;
 	public isTouched: boolean;
@@ -28,7 +31,6 @@ export class Player extends Phaser.GameObjects.Container {
 	private baseScale: number;
 	private touchPos: Phaser.Math.Vector2;
 	public velocity: Phaser.Math.Vector2;
-	private border: { [key: string]: number };
 
 	public footprintSpacing: number;
 	private distanceWalked: number;
@@ -38,6 +40,7 @@ export class Player extends Phaser.GameObjects.Container {
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
+		scene.physics.world.enable(this);
 		scene.add.existing(this);
 		this.scene = scene;
 
@@ -82,12 +85,14 @@ export class Player extends Phaser.GameObjects.Container {
 		this.inputVec = new Phaser.Math.Vector2(0, 0);
 		this.touchPos = new Phaser.Math.Vector2(0, 0);
 		this.velocity = new Phaser.Math.Vector2(0, 0);
-		this.border = {
-			left: 100,
-			right: scene.W - 100,
-			top: 100,
-			bottom: scene.H - 100,
-		};
+
+		/* Physics */
+		this.body = this.scene.physics.add.existing(this).body as Phaser.Physics.Arcade.Body
+		this.body.setCollideWorldBounds(true);
+        this.body.setOffset(-0.2 * this.spriteSize, 0.3 * this.spriteSize);
+		
+		this.body.setSize(0.4 * this.spriteSize, 0.1 * this.spriteSize)
+		
 	}
 
 	update(time: number, delta: number) {
@@ -124,14 +129,12 @@ export class Player extends Phaser.GameObjects.Container {
 
 		this.sprite.play(`${isMoving ? "walk" : "idle"}-${this.lastDirection.ver == DOWN ? "front" : "back"}`, true)
 
-		// Border collision
-		this.x = Phaser.Math.Clamp(this.x, this.border.left, this.border.right);
-		this.y = Phaser.Math.Clamp(this.y, this.border.top, this.border.bottom);
-
 		// Animation
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
-		this.setScale(this.lastDirection.hor == RIGHT ? 1 : -1, 1);
-		this.sprite.setScale(this.baseScale, this.baseScale * squish)
+		this.sprite.setScale(
+			this.baseScale * (this.lastDirection.hor == RIGHT ? 1 : -1),
+			this.baseScale * squish
+		)
 
 		// Foot prints
 		const newPosition = new Phaser.Math.Vector2(this.x, this.y)
