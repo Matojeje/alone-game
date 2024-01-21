@@ -3,7 +3,7 @@ import { Player } from "@/components/Player";
 import { Footprint } from "@/components/Footprint";
 import { Sparkle } from "@/components/Sparkle";
 import { UI } from "@/components/UI";
-import { clone, randomZoneFromShape } from '../assets/util';
+import { RGBtoInteger, clone, randomZoneFromShape } from '../assets/util';
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -83,6 +83,7 @@ export class GameScene extends BaseScene {
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
 		this.setupZorder();
+		this.setupAnimations();
 	}
 
 	update(time: number, delta: number) {
@@ -331,22 +332,62 @@ export class GameScene extends BaseScene {
 				return !wallBlocked
 			})
 
+			const xs = this.magic.prints.map(m => m.x)
+			const ys = this.magic.prints.map(m => m.y)
+			const minX = Math.min(...xs), minY = Math.min(...ys)
+
 			this.magic.prints.forEach(m => {
 				this.tweens.add({
-					ease: Phaser.Math.RND.pick(["Expo", "Quint", "Circ", "Back.out", "Back.inOut"]),
-					duration: Phaser.Math.RND.between(400, 800),
-					startDelay: Phaser.Math.RND.between(0, 200),
+					ease: Phaser.Math.RND.pick(["Expo", "Quint", "Quart", "Circ", "Back.out", "Back.inOut"]),
+					duration: Phaser.Math.RND.between(300, 700),
+					startDelay: Phaser.Math.RND.between(0, 50),
 					targets: m,
 
 					x: {from: clone(m.x), to: clone(m.x) + offsetX},
 					y: {from: clone(m.y), to: clone(m.y) + offsetY},
 					rotation: {from: clone(m.rotation), to: 0},
 
+					onComplete: () => {
+						this.magicResults.push(m)
+						
+						const tint = Phaser.Display.Color.HSLToColor(
+							Phaser.Math.RND.realInRange(185/360, 225/360),
+							Phaser.Math.RND.realInRange(0.6, 0.9),
+							Phaser.Math.RND.realInRange(0.4, 0.6),
+						)
 
+						m.sprite.play("spike")
+
+						this.tweens.add({
+							ease: "Quint.inOut",
+							duration: 1000,
+							targets: m.sprite,
+
+							scaleX: {from: clone(m.sprite.scale), to: clone(m.sprite.scale) * 2},
+							scaleY: {from: clone(m.sprite.scale), to: clone(m.sprite.scale) * 4},
+						})
+
+						this.tweens.add({
+							ease: "Quint.inOut",
+							duration: 1000,
+							targets: m,
+								
+							y: {from: clone(m.y), top: clone(m.y) - this.tilemap.tileHeight},
+
+							onUpdate: (tween) => {
+								const now = Phaser.Display.Color.Interpolate.ColorWithRGB(tint, 96, 97, 84, 1, 1-tween.progress)
+								m.sprite.tint = RGBtoInteger(now.r, now.g, now.b)
+							},
+
+							onComplete: () => {
+								
+							}
+						})
+					}
 				})
 			})
 
-			this.magicResults.push(...this.magic.prints)
+			// this.magicResults.push(...this.magic.prints)
 			this.resetMagic() 
 		}
 
@@ -428,6 +469,26 @@ export class GameScene extends BaseScene {
 		this.magic.prints.forEach(ft => {
 			this.footprints.remove(ft, false)
 			ft.magical = true
+		})
+	}
+
+	setupAnimations() {
+		this.anims.create({
+			key: "spike", repeat: 0, frames: [1,2,3,4,5,6,7,7,8,9,10,11,12,13,14,15].map(n => {
+				return {key: "footprint", frame: n, duration: 1000/60}
+			})
+		})
+
+		this.anims.create({
+			key: "lower", repeat: 0, frames: [15,14,13,12,11].map(n => {
+				return {key: "footprint", frame: n, duration: 1000/40}
+			})
+		})
+
+		this.anims.create({
+			key: "raise", repeat: 0, frames: [15,14,13,12,11].map(n => {
+				return {key: "footprint", frame: n, duration: 1000/40}
+			})
 		})
 	}
 }
