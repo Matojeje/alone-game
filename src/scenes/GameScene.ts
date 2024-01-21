@@ -179,6 +179,14 @@ export class GameScene extends BaseScene {
 
 	addFootprint() {
 
+		// Step on the ground
+		const paw = this.player.getPaw()
+		const tile = this.getTile(paw.x, paw.y)
+			.find(tile => tile.layer.name == "Ground")
+
+		// Check if footprint should be added
+		if (!(tile?.properties && tile.properties.footprints)) return
+
 		// Free up old footprints
 		if (this.footprints.isFull()) {
 			const prints = this.footprints.getChildren()
@@ -199,8 +207,6 @@ export class GameScene extends BaseScene {
 			else console.warn("Step #", oldestIdx, "not found")
 		}
 
-		// Add new footprint
-		const paw = this.player.getPaw()
 		const step: Footprint = this.footprints.getLast(false, true, paw.x, paw.y);
 		if (!step) return;
 		step.aliveTime = 0;
@@ -252,17 +258,10 @@ export class GameScene extends BaseScene {
 		}
 
 		this.currentRoom = roomName;
-		const prev = clone(this.roomAreas.get(this.previousRoom) ?? {x: 0, y: 0, width: 0, height: 0}) as Phaser.Geom.Rectangle
-
-		/* let x, y, w, h;
-
-		this.tweens.add({
-			targets: [x, y, w, h],
-			from: [prev.x, prev.y, prev.width, prev.height],
-			to: [room.x, room.y, room.width, room.height],
-			onUpdate: (tween, target, key, current, previous, param) => {}
-		})
-		this.cameras.main.setBounds(room.x, room.y, room.width, room.height) */
+		const prev = clone(
+			this.roomAreas.get(this.previousRoom) ??
+			{x: 0, y: 0, width: 0, height: 0}
+		) as Phaser.Geom.Rectangle
 
 		this.tweens.add({
 			ease: "Expo",
@@ -299,4 +298,10 @@ export class GameScene extends BaseScene {
             this.roomChange = false;
         }
     }
+
+	getTile(x: number, y: number) {
+		return this.tilemap.getTileLayerNames().map(layer => {
+			return this.tilemap.getTileAtWorldXY(x, y, false, undefined, layer) as Phaser.Tilemaps.Tile
+		}).filter(x => x != null)
+	}
 }

@@ -437,6 +437,24 @@
          "tileheight":64,
          "tiles":[
                 {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"footprints",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"footprints",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
                  "id":2,
                  "objectgroup":
                     {
