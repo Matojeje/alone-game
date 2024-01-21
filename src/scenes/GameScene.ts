@@ -24,9 +24,12 @@ export class GameScene extends BaseScene {
 
 	private sparkles: Map<number, Sparkle>;
 	private magic: {
-		origin: Phaser.Geom.Rectangle | undefined,
-		prints: Footprint[]
+		origin: string,
+		destination: string,
+		prints: Footprint[],
 	};
+
+	private magicResults: Phaser.GameObjects.Container[];
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -74,11 +77,9 @@ export class GameScene extends BaseScene {
 		this.snowflakes.setScrollFactor(0.8, 0.8)
 
 		this.previousRoom = ""
-		this.magic = {
-			origin: new Phaser.Geom.Rectangle(),
-			prints: []
-		}
+		this.magicResults = []
 
+		this.resetMagic();
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
 		this.setupZorder();
@@ -93,6 +94,14 @@ export class GameScene extends BaseScene {
 
 		this.magic.prints.forEach(m => m.update(time, delta))
 		this.sparkles.forEach(s => s.update(time, delta, this.player.getColliderBounds()))
+	}
+
+	resetMagic() {
+		this.magic = {
+			origin: "",
+			destination: "",
+			prints: []
+		}
 	}
 
 
@@ -143,8 +152,16 @@ export class GameScene extends BaseScene {
 					break;
 
 				case "Sparkle":
-					const sparkle = new Sparkle(this, obj.id, new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height))
-					this.sparkles.set(obj.id, sparkle)
+					const area = new Phaser.Geom.Rectangle(obj.x, obj.y, obj.width, obj.height)
+					const destination: any = obj.properties.find((x: any) => x.name == "destination")
+
+					if (!obj.properties || destination == undefined || !destination.value)
+						console.warn(`Sparkle #${obj.id} has no destination`)
+					else {
+						const sparkle = new Sparkle(this, obj.id, area, destination.value)
+						this.sparkles.set(obj.id, sparkle)
+					}
+
 					break;
 
 				default:
@@ -295,6 +312,44 @@ export class GameScene extends BaseScene {
 
 		/* console.debug(properties) */
 
+		console.debug([this.previousRoom, this.currentRoom, this.magic.origin, this.magic.destination])
+
+		// Magic footstep handling
+		if (this.previousRoom == this.magic.origin &&
+			this.currentRoom == this.magic.destination) {
+			
+			const prevArea = this.roomAreas.get(this.previousRoom) as Phaser.Geom.Rectangle
+			const currArea = this.roomAreas.get(this.currentRoom) as Phaser.Geom.Rectangle
+
+			const offsetX = currArea.x - prevArea.x
+			const offsetY = currArea.y - prevArea.y
+ 
+			this.magic.prints = this.magic.prints.filter(fp => {
+				const tile = this.getTile(fp.x + offsetX, fp.y + offsetY)
+				const wallBlocked = tile[0].layer.name == "Wall"
+				if (wallBlocked) fp.destroy()	
+				return !wallBlocked
+			})
+
+			this.magic.prints.forEach(m => {
+				this.tweens.add({
+					ease: Phaser.Math.RND.pick(["Expo", "Quint", "Circ", "Back.out", "Back.inOut"]),
+					duration: Phaser.Math.RND.between(400, 800),
+					startDelay: Phaser.Math.RND.between(0, 200),
+					targets: m,
+
+					x: {from: clone(m.x), to: clone(m.x) + offsetX},
+					y: {from: clone(m.y), to: clone(m.y) + offsetY},
+					rotation: {from: clone(m.rotation), to: 0},
+
+
+				})
+			})
+
+			this.magicResults.push(...this.magic.prints)
+			this.resetMagic() 
+		}
+
 		// Smooth camera room transition: false
 		if (!smoothCamera) {
 			this.cameras.main.setZoom(properties.zoom)
@@ -361,8 +416,14 @@ export class GameScene extends BaseScene {
 		const roomName = this.getRoom(obj.area)
 		if (!roomName) return console.warn(`Sparkle ${obj.id} activated outside a room`)
 
-		this.magic.origin = this.roomAreas.get(roomName)
-		this.magic.prints = this.footprints.getMatching("roomName", roomName)
+		this.magic = {
+			origin: roomName,
+			destination: obj.destination,
+			prints: this.footprints.getMatching("roomName", roomName)
+		}
+
+		if (this.magic.origin == this.magic.destination)
+		console.warn("Magic origin is the same as destination!")
 
 		this.magic.prints.forEach(ft => {
 			this.footprints.remove(ft, false)

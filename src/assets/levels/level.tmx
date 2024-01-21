@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="64" tileheight="64" infinite="1" nextlayerid="6" nextobjectid="14">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="64" tileheight="64" infinite="1" nextlayerid="6" nextobjectid="15">
  <editorsettings>
   <export target="level.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="debugtiles" tilewidth="64" tileheight="64" tilecount="128" columns="16">
   <image source="../images/tilesets/debugtiles.png" width="1024" height="512"/>
-  <tile id="0">
+  <tile id="0" type="snow">
    <properties>
     <property name="footprints" type="bool" value="true"/>
    </properties>
   </tile>
-  <tile id="1">
+  <tile id="1" type="brick">
    <properties>
     <property name="footprints" type="bool" value="false"/>
    </properties>
   </tile>
-  <tile id="2">
+  <tile id="2" type="wall">
    <objectgroup draworder="index" id="2">
     <object id="1" x="0" y="0" width="64" height="64"/>
     <object id="2" x="0" y="0" width="64" height="64"/>
    </objectgroup>
   </tile>
-  <tile id="3">
+  <tile id="3" type="ice">
    <properties>
     <property name="slippery" type="bool" value="true"/>
    </properties>
@@ -1169,6 +1169,13 @@
     <property name="staticCamera" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="13" name="Sparkle zone" type="Sparkle" x="8000" y="1561.33" width="512" height="82.6667"/>
+  <object id="13" name="Sparkle zone" type="Sparkle" x="8000" y="1561.33" width="512" height="82.6667">
+   <properties>
+    <property name="destination" value="Icy steps"/>
+   </properties>
+  </object>
+  <object id="14" name="Spawn point" type="Spawn" x="6592" y="1280">
+   <point/>
+  </object>
  </objectgroup>
 </map>

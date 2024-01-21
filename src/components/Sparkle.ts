@@ -7,17 +7,19 @@ export class Sparkle extends Phaser.GameObjects.Container {
     public scene: GameScene;
     public id: number;
     public area: Phaser.Geom.Rectangle;
-    public activated: boolean
+    public activated: boolean;
+    public destination: string;
 
 	private particles: Phaser.GameObjects.Particles.ParticleEmitter;
 
-	constructor(scene: GameScene, id: number, area: Phaser.Geom.Rectangle) {
+	constructor(scene: GameScene, id: number, area: Phaser.Geom.Rectangle, destination: string) {
 		super(scene, area.x, area.y);
 		scene.add.existing(this);
 		this.scene = scene;
 
         this.area = area;
         this.activated = false;
+        this.destination = destination;
 
         this.particles = this.scene.add.particles(0, 0, "sparkle", {
             lifespan: 350,
