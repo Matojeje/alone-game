@@ -10,7 +10,6 @@ const images: Image[] = [
 	image('tilesets/debugtiles', 'debugtiles'),
 
 	// Particles
-	image('particles/footprint', 'footprint'),
 	image('particles/snowflake', 'snowflake'),
 	image('particles/sparkle', 'sparkle'),
 
@@ -30,6 +29,7 @@ const images: Image[] = [
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
 	spritesheet('characters/player', 'player', 380, 540),
+	spritesheet('particles/footprint', 'footprint', 128, 128),
 
 ];
 

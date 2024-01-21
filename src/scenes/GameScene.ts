@@ -23,6 +23,10 @@ export class GameScene extends BaseScene {
 	private roomChange: boolean;
 
 	private sparkles: Map<number, Sparkle>;
+	private magic: {
+		origin: Phaser.Geom.Rectangle | undefined,
+		prints: Footprint[]
+	};
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -44,6 +48,7 @@ export class GameScene extends BaseScene {
 
 		this.ui = new UI(this);
 		this.ui.setScrollFactor(0, 0, true)
+		this.loadTilemap();
 
 		this.footprints = this.add.group({
 			classType: Footprint,
@@ -53,25 +58,27 @@ export class GameScene extends BaseScene {
 
 		this.totalSteps = 0;
 
-		const topLine = new Phaser.Curves.Line([0, 0, this.W, 0])
-		const bottomLine = new Phaser.Curves.Line([0, this.H, this.W, this.H])
+		const snowflakeArea = new Phaser.Geom.Rectangle(-1000, -1000, this.tilemap.widthInPixels+2000, this.tilemap.heightInPixels)
 
 		this.snowflakes = this.add.particles(0, 0, "snowflake", {
 			lifespan: {min: 3500, max: 8000},
 			alpha: {start: 0.8, end: 0},
-			scale: {min: 0.3, max: 0.5},
+			scale: {min: 0.2, max: 0.4},
 			speedX: {min: -100, max: 20},
 			speedY: {min: 150, max: 250},
-			frequency: 150,
+			frequency: 5,
 			gravityY: 50,
 			emitting: true,
-			emitZone: randomZoneFromShape(topLine),
+			emitZone: randomZoneFromShape(snowflakeArea),
 		})
-		this.snowflakes.setScrollFactor(0, 0)
+		this.snowflakes.setScrollFactor(0.8, 0.8)
 
 		this.previousRoom = ""
+		this.magic = {
+			origin: new Phaser.Geom.Rectangle(),
+			prints: []
+		}
 
-		this.loadTilemap();
 		this.changeRoom("Welcome", false);
 		this.initTouchControls();
 		this.setupZorder();
@@ -84,6 +91,7 @@ export class GameScene extends BaseScene {
 		if (this.roomChange) this.changeRoom(this.currentRoom)
 		this.ui.update(time, delta);
 
+		this.magic.prints.forEach(m => m.update(time, delta))
 		this.sparkles.forEach(s => s.update(time, delta, this.player.getColliderBounds()))
 	}
 
@@ -353,11 +361,12 @@ export class GameScene extends BaseScene {
 		const roomName = this.getRoom(obj.area)
 		if (!roomName) return console.warn(`Sparkle ${obj.id} activated outside a room`)
 
-		const footprints = this.footprints.getChildren().filter(go => {
-			const ft = go as Footprint
-			return ft.roomName == roomName
-		}) as Footprint[]
+		this.magic.origin = this.roomAreas.get(roomName)
+		this.magic.prints = this.footprints.getMatching("roomName", roomName)
 
-		footprints.forEach(ft => ft.sprite.setTint(0xff0000))
+		this.magic.prints.forEach(ft => {
+			this.footprints.remove(ft, false)
+			ft.magical = true
+		})
 	}
 }

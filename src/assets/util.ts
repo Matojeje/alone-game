@@ -66,3 +66,26 @@ export const randomZoneFromShape = (shape: ObjectWithRandomPoint) => new Phaser.
 })
 
 export const clone = (source: any) => JSON.parse(JSON.stringify(source))
+
+export const RGBtoInteger = (r: number, g: number, b: number) => (r << 16) + (g << 8) + (b << 0);
+
+export const RAINBOW = [
+    0xff3300,
+    0xff6600,
+    0xff9900,
+    0xffbb00,
+    0xffee00,
+    0xffff00,
+    0xaaff00,
+    0x66ff00,
+    0x22ff00,
+    0x11ff66,
+    0x00ffee,
+    0x00ccff,
+    0x0099ff,
+    0x0066ff,
+    0x6600ff,
+    0xaa00aa,
+    0xcc0066,
+    0xff00aa,
+]
