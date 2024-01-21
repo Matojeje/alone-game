@@ -136,12 +136,6 @@ export class GameScene extends BaseScene {
 			}
 		})
 
-		// Add collisions.
-		// this.physics.add.collider(this.player,  this.layer);
-		/* this.physics.add.overlap(this.player,   this.stairs,     function() {
-			this.player.onStairs = true;
-		}, null, this); */
-
 	}
 
 	initTouchControls() {
@@ -184,7 +178,12 @@ export class GameScene extends BaseScene {
 		const paw = this.player.getPaw()
 		const tile = this.getTile(paw.x, paw.y)
 			.find(tile => tile.layer.name == "Ground")
+		
+		// console.debug(tile?.properties)
 
+		// Set slippery
+		this.player.slipping = (tile?.properties && tile.properties.slippery) || false
+			
 		// Check if footprint should be added
 		if (!(tile?.properties && tile.properties.footprints)) return
 
