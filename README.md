@@ -4,6 +4,10 @@ A short walk in a snowy forest where you make your own obstacles!
 
 Made for a [university-held game jam](https://cphoto.fit.vutbr.cz/ludo/courses/izhv/final/gj/) in 2024.
 
+Play on itch.io: https://matojeje.itch.io/snowy-trails
+
+![Screenshot](screenshot1.png)
+
 ## Credits
 
 - Art, music, code: @Matojeje

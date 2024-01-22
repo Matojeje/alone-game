@@ -27,10 +27,12 @@ export class Sparkle extends Phaser.GameObjects.Container {
 			scale: { start: 0.9, end: 0.1 },
 			alpha: { start: 1, end: 0 },
 			blendMode: 'ADD',
-			frequency: 120,
+			frequency: 90,
 			emitting: true,
 			emitZone: randomZoneFromShape(area),
 		})
+
+        this.particles.setDepth(45);
 	}
 
     update(time: number, delta: number, playerBounds: Phaser.Geom.Rectangle) {
